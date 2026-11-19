@@ -32,12 +32,13 @@ offline and usable without any of the heavy modules.
 | 1 | Core trainer, 5 rhythms | `docs/phases/1-core-trainer.md` | done |
 | 1b | GitHub Pages deploy + verify | live at https://chromedigi.github.io/ekg-trainer/ | done; owner tested on a real iPhone, nothing to fix |
 | 2 | Difficult rhythms: clinically accurate advanced rhythms, meaningful lookalikes, borderline strips, stronger exam prep | `docs/phases/2-difficult-rhythms.md` | done and live; nurse review pending |
+| 2b | Premium UI: app icon, icon system, design language, home dashboard, first-launch onboarding (replaces old step 8) | `docs/phases/3-premium-ui.md` | next |
 | 3 | Adaptive learning: FSRS spaced repetition, mastery, contrast and boundary practice, practice vs exam tracking | `docs/future/adaptive-learning.md` | |
 | 4 | Photo import (optional): educational images, on-device, privacy-first | `docs/future/photo-import.md` | when rules can be met |
 | 5 | Campus research and blockout: reference boards, ambiguity log, accurate massing | `docs/future/3d-campus.md` | |
 | 6 | Campus mastery visualization: detailed models, lighting, mastery-driven illumination | `docs/future/3d-campus.md` | |
 | 7 | Cinematic intro video from real, finished features | `docs/future/cinematic-intro.md` | |
-| 8 | iPhone install and usage walkthrough | `docs/future/iphone-onboarding.md` | |
+| 8 | iPhone install and usage walkthrough | `docs/future/iphone-onboarding.md` | moved into 2b (owner, 2026-11-19) |
 | 9 | Final QA: accessibility, iPhone performance, clinical-content verification | | |
 
 Clinical side-tracks to fit in after step 3, once the core is solid:

@@ -12,6 +12,15 @@ distractors, borderline strips near cutoffs, stronger exam prep. Generator tests
 rhythm, everything tagged pending nurse review. Include fixes from the owner's iPhone test.
 Screenshot at phone width, verify the live site after push."
 
+## Step 2b: Premium UI, icon, dashboard, onboarding
+"Start step 2b. Read CLAUDE.md, docs/handoff.md and docs/phases/3-premium-ui.md. New
+branch. Build, in order: the SVG app icon and all icon assets (apple-touch-icon, PWA
+192/512/maskable, favicon) with manifest and head updated; one custom SVG icon sprite and
+extended design tokens in docs/spec.md; restyled components and micro-animations; a Home
+dashboard tab with honest data; skippable onboarding with real screenshots and Replay.
+Keep every existing feature and test passing. Verify at iPhone 13 and SE sizes in
+Chromium, standalone manifest, offline, contrast. Then the owner's push."
+
 ## Step 3: Adaptive learning
 "Start step 3. Read docs/future/adaptive-learning.md, write the phase doc. Implement FSRS
 with default parameters in vanilla JS, ekg.progress.v2 with migration from v1, mastery

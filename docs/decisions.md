@@ -31,3 +31,5 @@
 | 2026-11-19 | No 2:1 AV block question | LITFL: type I vs II often can't be told apart at 2:1; asking would teach guessing |
 | 2026-11-19 | AIVR 50 to 100, VT over 100, generator avoids 100 to 110 | LITFL AIVR (50 to 120, VT over 110) and StatPearls VT (over 100) disagree; the app avoids the zone and says so on the card |
 | 2026-11-19 | Exam prefs get optional `set` and `edge` fields without a key bump | Additive with defaults, so old `ekg.prefs.v1` data still loads unchanged |
+| 2026-11-19 | Premium UI, icon and onboarding come before adaptive learning; onboarding moves up from step 8 | Owner tested phase 2 on the iPhone and wants it to feel like a premium App Store app first |
+| 2026-11-19 | App icon and icon system drawn as code (SVG), rendered to PNG locally | Exact P-QRS-T shape, crisp at every size, one consistent stroke system, works offline, editable later; AI image tools give inconsistent raster art |

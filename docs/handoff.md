@@ -11,12 +11,23 @@ Updated 2026-11-19. Read CLAUDE.md, then docs/plan.md, then this.
 - Future modules documented in `docs/future/`. Roadmap in docs/plan.md.
 
 ## In progress
-- Phase 2 is live and verified in Chromium (service worker cache `ekg-v2`). Owner to try
-  the new screens on the real iPhone.
+- Phase 2 is live and verified in Chromium (service worker cache `ekg-v2`).
+- Owner tested phase 2 on the real iPhone and asked for a premium redesign (2026-11-19).
+  Full request captured in `docs/phases/3-premium-ui.md`; new delivery order in
+  docs/plan.md (step 2b first). Nothing built yet.
 
 ## Next
-- Nurse review of the 26 rhythm cards (all `review: "pending"`).
-- Step 3 (adaptive learning, FSRS). Prompt in docs/prompts.md.
+- Step 2b on a new branch, in this order: SVG app icon + all icon assets; custom icon
+  sprite + design tokens; restyled components and micro-animations; Home dashboard with
+  honest data; skippable onboarding with real screenshots. Prompt in docs/prompts.md.
+- Then step 3 (adaptive learning), campus, video, final QA.
+- Nurse review of the 26 rhythm cards (all `review: "pending"`) is still open.
+
+## Notes for step 2b
+- Local Playwright + Chromium render the icon PNGs and screenshots (see how phase 2
+  drove the app: python3 -m http.server, devices['iPhone 13']).
+- Video later: the HyperFrames compose tool is disabled from Claude Code; Remotion needs
+  npm and stays outside the app (dev-only), owner approves first.
 
 ## Environment notes
 - litfl.com fetches work with plain curl. Use the exact slugs from `docs/sources.md`;
