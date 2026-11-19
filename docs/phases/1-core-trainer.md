@@ -42,5 +42,9 @@ Done 2026-11-19.
 - Driven in Chromium emulating iPhone 13: welcome, practice + feedback, calipers, learn,
   monitor view, 10-strip exam, results review, progress. No console errors, no horizontal
   scroll at 360 px, service worker registers, progress saved to `ekg.progress.v1`.
-- Not verified: real iPhone Safari (layout, Add to Home Screen, offline after install),
+- Deployed 2026-11-19 to https://chromedigi.github.io/ekg-trainer/ (Pages, branch main).
+  Live checks in Chromium: all 10 files serve 200 with correct types; full click-through
+  as iPhone 13 with no errors; no horizontal scroll on iPhone 13, iPhone SE, landscape and
+  360 px; offline reload after first visit still renders strips and choices.
+- Not verified: real iPhone Safari (WebKit isn't installed in the build environment) (layout, Add to Home Screen, offline after install),
   clinical review by the nurse.

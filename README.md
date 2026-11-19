@@ -16,6 +16,9 @@ provider.
 - Progress: accuracy and speed per rhythm, this week vs before, exam history
 - Calipers and 2x zoom on every strip; works offline
 
+**Live:** https://chromedigi.github.io/ekg-trainer/ (GitHub Pages from `main`). On iPhone:
+open in Safari, Share, Add to Home Screen.
+
 ## Run it
 Serve the folder with any static server, for example `python3 -m http.server 8000`,
 then open http://localhost:8000. (Opening `index.html` directly works too, minus offline mode.)
