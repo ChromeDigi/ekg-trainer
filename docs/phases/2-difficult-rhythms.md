@@ -90,7 +90,10 @@ AV dissociation in 3rd degree, compensatory pause after PVCs, flutter rate, VF a
 amplitudes).
 
 ## Status
-Built 2026-11-19, committed, waiting for the owner's push.
+Built and pushed 2026-11-19 (e2b4381). Live checks on https://chromedigi.github.io/ekg-trainer/
+in Chromium as iPhone 13: all 11 files serve 200 with correct types, 26 rhythms load,
+full click-through with no errors and no horizontal scroll at 390 and 360 px, offline
+reload after the first visit still shows a strip and 4 choices.
 - `node tests/run.js`: 3,067,999 checks pass (800 strips per rhythm, a third borderline).
 - Every strip type looked at by eye in a gallery render; fixed faint flutter waves, a
   torsades twist that flipped too fast, PAC P waves too similar to sinus, and P-count
@@ -99,5 +102,4 @@ Built 2026-11-19, committed, waiting for the owner's push.
   feedback, all 5 Learn groups (26 cards), exam setup with the new options, a 10-strip
   all-26 exam with near-cutoff strips, results with group breakdown, Progress. No console
   errors, no horizontal scroll at 390 or 360 px.
-- Not verified: real iPhone Safari for the new screens, the live site (after push),
-  clinical review by the nurse (all 26 rhythms tagged pending).
+- Not verified: real iPhone Safari for the new screens, clinical review by the nurse (all 26 rhythms tagged pending).

@@ -11,8 +11,8 @@ Updated 2026-11-19. Read CLAUDE.md, then docs/plan.md, then this.
 - Future modules documented in `docs/future/`. Roadmap in docs/plan.md.
 
 ## In progress
-- Phase 2 waits for the owner's push. After the push: verify the live site (files 200,
-  click-through at iPhone width, offline reload; service worker cache is now `ekg-v2`).
+- Phase 2 is live and verified in Chromium (service worker cache `ekg-v2`). Owner to try
+  the new screens on the real iPhone.
 
 ## Next
 - Nurse review of the 26 rhythm cards (all `review: "pending"`).

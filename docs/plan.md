@@ -31,7 +31,7 @@ offline and usable without any of the heavy modules.
 | 0 | Foundation docs | this folder | done |
 | 1 | Core trainer, 5 rhythms | `docs/phases/1-core-trainer.md` | done |
 | 1b | GitHub Pages deploy + verify | live at https://chromedigi.github.io/ekg-trainer/ | done; owner tested on a real iPhone, nothing to fix |
-| 2 | Difficult rhythms: clinically accurate advanced rhythms, meaningful lookalikes, borderline strips, stronger exam prep | `docs/phases/2-difficult-rhythms.md` | built, pending push and nurse review |
+| 2 | Difficult rhythms: clinically accurate advanced rhythms, meaningful lookalikes, borderline strips, stronger exam prep | `docs/phases/2-difficult-rhythms.md` | done and live; nurse review pending |
 | 3 | Adaptive learning: FSRS spaced repetition, mastery, contrast and boundary practice, practice vs exam tracking | `docs/future/adaptive-learning.md` | |
 | 4 | Photo import (optional): educational images, on-device, privacy-first | `docs/future/photo-import.md` | when rules can be met |
 | 5 | Campus research and blockout: reference boards, ambiguity log, accurate massing | `docs/future/3d-campus.md` | |
