@@ -33,3 +33,9 @@
 | 2026-11-19 | Exam prefs get optional `set` and `edge` fields without a key bump | Additive with defaults, so old `ekg.prefs.v1` data still loads unchanged |
 | 2026-11-19 | Premium UI, icon and onboarding come before adaptive learning; onboarding moves up from step 8 | Owner tested phase 2 on the iPhone and wants it to feel like a premium App Store app first |
 | 2026-11-19 | App icon and icon system drawn as code (SVG), rendered to PNG locally | Exact P-QRS-T shape, crisp at every size, one consistent stroke system, works offline, editable later; AI image tools give inconsistent raster art |
+| 2026-11-19 | Home tab shows accuracy (last 20 answers), never "mastery"; untried reads "not tried yet" | Mastery needs the step 3 model; a 0% for an untried group would be false |
+| 2026-11-19 | One rule-based "Suggested next" with its reason on screen (misses, untried group, thin data, lowest group, else exam) | Transparent and testable; no fake intelligence before step 3 |
+| 2026-11-19 | Intro shown once per intro version via an additive `tour` field in `ekg.prefs.v1` | Existing users see it once too; no key bump needed since old data loads unchanged |
+| 2026-11-19 | Intro screenshots are captured from the real app by a dev script, with sample progress data | Real UI, reproducible after UI changes, no personal data |
+| 2026-11-19 | Dev-only Playwright scripts live in `tools/`; the app stays dependency-free | Icons and screenshots are generated, but nothing new ships or loads at runtime |
+| 2026-11-19 | Full-screen strip turns the strip sideways instead of relying on rotation | Manifest locks portrait; sideways gives about 2.5x the size on a phone. Calipers stay on the normal view |

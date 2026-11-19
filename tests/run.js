@@ -226,4 +226,27 @@ ok(sc.groups.find((g) => g.id === "blocks").correct === 1 && sc.groups.find((g) 
 for (let i = 0; i < 1000; i++) ok(quiz.pickRhythm({ nsr: 0, vt: 1, afib: 2 }, r) !== "nsr", "zero weight never picked");
 ok(quiz.boxes(0.10) === "2.5" && quiz.boxes(0.2) === "5", "small boxes shown with one decimal");
 
+// Progress: honest dashboard numbers (accuracy, "not tried yet", recent misses), prefs migration.
+{
+  const store = { "ekg.prefs.v1": JSON.stringify({ ack: true, exam: { count: 10 } }) };
+  globalThis.localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); } };
+  require("../js/progress.js");
+  const pg = globalThis.EKG.progress;
+  ok(pg.prefs().ack === true && !pg.prefs().tour, "old prefs load; tour defaults to unseen");
+  ok(pg.accuracy(["nsr"]).pct === null && pg.accuracy(["nsr"]).n === 0, "no answers: not tried yet, not 0%");
+  pg.record("nsr", true, 900, "practice");
+  pg.record("vt", false, 1200, "practice");
+  pg.record("afib", false, 1500, "exam");
+  pg.record("vt", false, 1100, "practice");
+  pg.record("nsr", false, 800, "practice");
+  ok(pg.accuracy(["nsr"]).pct === 50, "accuracy from real answers");
+  ok(pg.accuracy(["nsr", "vt"]).n === 4 && pg.accuracy(["nsr", "vt"]).pct === 25, "group accuracy pools its rhythms");
+  ok(JSON.stringify(pg.recentMisses(5)) === JSON.stringify(["nsr", "vt", "afib"]), "recent misses: distinct, newest first");
+  for (let i = 0; i < 30; i++) pg.record("vt", true, 700, "practice");
+  ok(pg.accuracy(["vt"]).pct === 100 && pg.accuracy(["vt"], 20).n === 20, "accuracy uses the last 20 answers");
+  ok(JSON.parse(store["ekg.progress.v1"]).answers.length === 35, "answers saved to ekg.progress.v1");
+  pg.reset();
+  ok(pg.accuracy(["vt"]).pct === null && pg.recentMisses(5).length === 0, "reset clears dashboard data");
+}
+
 console.log("all", checks, "checks passed");

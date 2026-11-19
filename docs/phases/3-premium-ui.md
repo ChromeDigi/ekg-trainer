@@ -61,5 +61,41 @@ Substantial features go on their own branches. Keep improving clinical accuracy 
 - Any framework, build step or web font (system fonts stay; SF Pro on iPhone).
 - HMH logos or branding.
 
-## Status
-Spec written 2026-11-19. Not started.
+## How similar apps do it (looked at before building)
+- Duolingo-style home: one big "continue" button plus streaks and leagues. Clear next step,
+  but streak pressure is the wrong signal for someone with test anxiety. This app keeps the
+  big button and drops the streaks.
+- Anki: honest "due today" counts, no judgment, but a dated look and no guidance on *what*
+  to study. This app shows a single suggestion and says why ("your lowest group: 58% over
+  your last 20 answers").
+- Apple Fitness rings: instantly readable progress. Used here per rhythm group, but labeled
+  "accuracy" (not mastery), and an untried group shows a dashed ring and "not tried yet".
+- The nurse drills in `docs/research.md` (SkillStat, Practical Clinical Skills, Arrhythmia)
+  open straight into a quiz with no intro. The intro here is short, skippable, uses real
+  screenshots, and states the limits plainly.
+
+## Status (step 2b, built 2026-11-19 on branch `step-2b-premium-ui`)
+- 3a icon: done. `tools/make-icons.js`; manifest has 192, 512, maskable 512 and SVG;
+  `<head>` has apple-touch-icon, SVG and 32 px favicons. Checked at 512, 60 pt, 40, 32 and
+  16 px, iOS rounded mask and Android circle crop (complex inside the safe zone).
+- 3b icons and design language: done. 30-icon sprite, tokens in `docs/spec.md`, restyled
+  cards, buttons, segmented controls, choices, tags, tables, sheets. Micro-animations:
+  view entrance, correct pulse, wrong shake, press scale, ring and bar fill; all off under
+  reduced motion. Strip: thicker trace, bigger labels, tighter side padding, new
+  Full screen button that turns the strip sideways along the long edge (view only, no
+  calipers there).
+- 3c Home: done. Monitor header (live sweep, HR column), Continue studying, Suggested next
+  with its reason, Recently missed chips (open the rhythm's Learn card), accuracy rings per
+  group (last 20 answers), shortcuts, last exam, honest note that mastery isn't built.
+- 3d intro: done. `js/tour.js`, 8 cards, 5 real screenshots captured from the app by
+  `tools/capture-tour.js` (sample progress data, WebP, 31 to 70 KB each), Skip on every
+  card, swipe or Next, Replay from About, Escape closes. Shown once per intro version
+  (`tour` field in `ekg.prefs.v1`, additive), so existing users see it once too.
+  Replaces the welcome dialog; the disclaimer moved to card 1 and About.
+- Verified in Chromium (Playwright) at iPhone 13 (390x844) and iPhone SE (375x667): no
+  console errors, no horizontal scroll on any tab, intro swipe and Skip save the pref,
+  Replay and Escape work, offline reload renders from cache `ekg-v3` (23 files including the
+  intro images), manifest standalone with all icons. Text contrast 5.2:1 or better.
+  `node tests/run.js` passes (3,068,007 checks, including new progress tests).
+- Not verified: real iPhone (Safari Add to Home Screen, actual Home Screen icon, safe-area
+  insets, the sideways full-screen strip in hand), VoiceOver. Owner check after the push.

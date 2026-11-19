@@ -70,7 +70,7 @@
 
     // Calibration pulse: 1 mV tall, 0.2 s wide.
     ctx.strokeStyle = css("--trace");
-    ctx.lineWidth = Math.max(1.25, 1.6 * Math.min(1, pxmm / 2.5));
+    ctx.lineWidth = Math.max(1.5, 2 * Math.min(1, pxmm / 2.2));
     ctx.lineJoin = "round";
     ctx.beginPath();
     ctx.moveTo(x(-LEAD), y(0));
@@ -92,7 +92,7 @@
     ctx.fillStyle = css("--muted");
     ctx.strokeStyle = css("--muted");
     ctx.lineWidth = 1;
-    ctx.font = "11px " + css("--font-mono");
+    ctx.font = "12px " + css("--font-mono");
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
     for (let sec = 0; sec <= strip.seconds; sec++) {

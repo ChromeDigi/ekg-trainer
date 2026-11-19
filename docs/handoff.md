@@ -11,16 +11,18 @@ Updated 2026-11-19. Read CLAUDE.md, then docs/plan.md, then this.
 - Future modules documented in `docs/future/`. Roadmap in docs/plan.md.
 
 ## In progress
-- Phase 2 is live and verified in Chromium (service worker cache `ekg-v2`).
-- Owner tested phase 2 on the real iPhone and asked for a premium redesign (2026-11-19).
-  Full request captured in `docs/phases/3-premium-ui.md`; new delivery order in
-  docs/plan.md (step 2b first). Nothing built yet.
+- Step 2b (premium UI) built on branch `step-2b-premium-ui`, committed, not pushed. Coded app
+  icon, 30-icon sprite, tokens, restyle and micro-animations, Home dashboard, 8-card intro
+  with real screenshots. Verified in Chromium at iPhone 13 and SE (details and what was not
+  verified in `docs/phases/3-premium-ui.md`). Service worker cache `ekg-v3`.
+- Waiting for the owner's "push", then a real-iPhone check (Add to Home Screen icon,
+  intro, full-screen strip, safe areas).
 
 ## Next
-- Step 2b on a new branch, in this order: SVG app icon + all icon assets; custom icon
-  sprite + design tokens; restyled components and micro-animations; Home dashboard with
-  honest data; skippable onboarding with real screenshots. Prompt in docs/prompts.md.
-- Then step 3 (adaptive learning), campus, video, final QA.
+- After the push: merge to main so GitHub Pages serves it, check on the iPhone.
+- Then step 3 (adaptive learning), campus, video, final QA. Prompt in docs/prompts.md.
+- Regenerate icons with `node tools/make-icons.js` and intro screenshots with
+  `python3 -m http.server 8765 & node tools/capture-tour.js` after UI changes.
 - Nurse review of the 26 rhythm cards (all `review: "pending"`) is still open.
 
 ## Notes for step 2b

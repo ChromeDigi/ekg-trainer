@@ -30,7 +30,9 @@ Plain HTML, CSS and JavaScript. No framework, no dependencies, no build step, no
 - `js/strip.js`: draws strips on `<canvas>` (grid, trace, live sweep, calipers).
 - `js/drill.js`, `js/exam.js`, `js/scenarios.js`: practice modes.
 - `js/progress.js`: scores, missed rhythms, spaced repetition.
-- `sw.js` + `manifest.webmanifest`: offline + Add to Home Screen.
+- `js/tour.js`: first-launch intro (real screenshots in `img/tour/`).
+- `sw.js` + `manifest.webmanifest` + `icons/`: offline + Add to Home Screen.
+- `tools/`: dev-only Playwright scripts (icons, intro screenshots). Never loaded by the app.
 
 ### Roadmap and future modules
 - Roadmap and delivery order: `docs/plan.md`. Future specs: `docs/future/` (3D campus,

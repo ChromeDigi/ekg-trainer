@@ -1,6 +1,7 @@
 /* Progress and prefs in localStorage. Versioned keys; bump + migrate if shapes change.
    ekg.progress.v1 = { answers: [{ r, ok, ms, mode, at }], sessions: [...], review: { id: n } }
-   ekg.prefs.v1    = { ack, exam: { count, seconds, passMark, lethal, showTimer } } */
+   ekg.prefs.v1    = { ack, tour, exam: { count, seconds, passMark, lethal, showTimer, set, edge } }
+   (tour = version of the intro last seen; additive field, defaults to 0, no key bump) */
 (function (root) {
   "use strict";
   const PKEY = "ekg.progress.v1", FKEY = "ekg.prefs.v1";
@@ -83,11 +84,32 @@
     };
   }
 
+  // Accuracy over the most recent `last` answers for any of `ids` (practice and exam).
+  // pct is null when nothing has been answered yet ("not tried yet", never 0%).
+  function accuracy(ids, last) {
+    const set = {};
+    ids.forEach(function (id) { set[id] = true; });
+    const mine = P.answers.filter(function (a) { return set[a.r]; });
+    const recent = mine.slice(-(last || 20));
+    const right = recent.filter(function (a) { return a.ok; }).length;
+    return { n: recent.length, attempts: mine.length, right: right, pct: recent.length ? Math.round((right / recent.length) * 100) : null };
+  }
+
+  // Distinct rhythms missed most recently, newest first.
+  function recentMisses(n) {
+    const out = [];
+    for (let i = P.answers.length - 1; i >= 0 && out.length < n; i--) {
+      const a = P.answers[i];
+      if (!a.ok && out.indexOf(a.r) < 0) out.push(a.r);
+    }
+    return out;
+  }
+
   function reset() { P = emptyProgress(); save(); }
 
   root.EKG = root.EKG || {};
   root.EKG.progress = {
-    record: record, addSession: addSession, reviewIds: reviewIds, weights: weights, stats: stats, reset: reset,
+    record: record, addSession: addSession, accuracy: accuracy, recentMisses: recentMisses, reviewIds: reviewIds, weights: weights, stats: stats, reset: reset,
     prefs: function () { return F; },
     savePrefs: function (f) { F = f; write(FKEY, F); }
   };
