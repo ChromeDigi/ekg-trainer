@@ -102,6 +102,20 @@ schematic with north up; it shows positions and adjacency, not exact sizes.
 - OpenStreetMap: `api.openstreetmap.org` works (owner allowed it); `overpass-api.de` and
   `overpass.kumi.systems` cut or time out. Data pulled for the campus area on 2026-11-19.
 
+## Lidar and aerial imagery (2026-11-19)
+- USGS lists a **2023 lidar scan** covering the campus: project `NJ_NE6County_B23`, tiles
+  `K5B13` (west, 833 MB) and `K5B14` (east, 711 MB; covers St. John and Helena Theurer
+  Pavilion). Published 2026-09-15, so it postdates the 2023 opening. Public domain.
+- Automated download is blocked: `rockyweb.usgs.gov` answers scripts with a bot-check
+  page, and the S3 mirror has only metadata for this block. The NJ state imagery server
+  (`img.nj.gov`) is behind a bot wall too. We don't get around bot checks.
+- USGS imagery basemap downloads fine but is too blurry at campus scale to trace from.
+- An older 2015 tile (`NJ_New_Jersey_SANDY_LiDAR_15`, 18TWL790255, 29 MB) predates Helena
+  Theurer Pavilion; same download block.
+- Route that works: the owner downloads `K5B14` in a normal browser (USGS National Map
+  Downloader) and shares the folder with this session, then heights and footprints are
+  measured from the points.
+
 ## What OpenStreetMap has (and doesn't)
 - **No heights or floor counts** on any campus building (`height` / `building:levels`
   absent everywhere).
