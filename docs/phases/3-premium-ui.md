@@ -61,6 +61,12 @@ Substantial features go on their own branches. Keep improving clinical accuracy 
 - Any framework, build step or web font (system fonts stay; SF Pro on iPhone).
 - HMH logos or branding.
 
+## Revision (owner, 2026-11-19, after the first 2b build)
+Light day mode plus dark night mode with a user choice (System default); healthcare-tech
+shell inspired by modern hospital UI without HMH branding; strip themes separate from the
+app theme (paper, green monitor, amber monitor); orange as a restrained accent; refined
+effects. Built on the same branch, keeping all earlier 2b work.
+
 ## How similar apps do it (looked at before building)
 - Duolingo-style home: one big "continue" button plus streaks and leagues. Clear next step,
   but streak pressure is the wrong signal for someone with test anxiety. This app keeps the
@@ -97,5 +103,12 @@ Substantial features go on their own branches. Keep improving clinical accuracy 
   Replay and Escape work, offline reload renders from cache `ekg-v3` (23 files including the
   intro images), manifest standalone with all icons. Text contrast 5.2:1 or better.
   `node tests/run.js` passes (3,068,007 checks, including new progress tests).
+- Revision: `js/theme.js` (in `<head>`, no flash), Appearance sheet (gear button) with
+  App theme and Strip colors plus a live preview strip, both themes and three strip themes
+  in tokens, new icon, intro screenshots recaptured in the light theme. Verified again in
+  light and dark at iPhone 13 and SE: no errors, no horizontal scroll, offline reload with
+  24 cached files.
+- Not verified: the iPhone status bar style switch (light theme sets `default`, dark sets
+  `black-translucent` at launch; iOS may only read it when the icon is added).
 - Not verified: real iPhone (Safari Add to Home Screen, actual Home Screen icon, safe-area
   insets, the sideways full-screen strip in hand), VoiceOver. Owner check after the push.

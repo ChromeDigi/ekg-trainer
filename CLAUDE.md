@@ -16,7 +16,7 @@ Plain HTML, CSS and JavaScript. No framework, no dependencies, no build step, no
 
 - **HTML** (`index.html`): structure and content. What is on the screen.
 - **CSS** (`styles.css`): the look. Colors, fonts, layout. All colors are CSS variables
-  on `:root`; values come from `docs/spec.md`.
+  per theme (`data-theme`, `data-strip`); values come from `docs/spec.md`.
 - **JavaScript** (`js/*.js`): what the app does. Drawing strips, quizzes, scoring, saving.
 - **Security**: built in from the start, not added last. No backend means no server to
   attack; the rules below cover the rest.
@@ -73,7 +73,8 @@ Plain HTML, CSS and JavaScript. No framework, no dependencies, no build step, no
   Must work fully offline after the first load.
 - Insert any text that isn't hard-coded with `textContent`, never `innerHTML`.
 - Phone first: usable one-handed at 360 px wide, tap targets at least 44 px, no
-  horizontal scroll. Dark by default (night shift).
+  horizontal scroll. Light and dark themes (System default); strip colors are a separate
+  setting (see docs/spec.md).
 - Commit identity uses the GitHub no-reply email; don't change it.
 
 ## Working style

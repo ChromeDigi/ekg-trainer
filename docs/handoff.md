@@ -13,7 +13,8 @@ Updated 2026-11-19. Read CLAUDE.md, then docs/plan.md, then this.
 ## In progress
 - Step 2b (premium UI) built on branch `step-2b-premium-ui`, committed, not pushed. Coded app
   icon, 30-icon sprite, tokens, restyle and micro-animations, Home dashboard, 8-card intro
-  with real screenshots. Verified in Chromium at iPhone 13 and SE (details and what was not
+  with real screenshots. Revised the same day: light default plus dark mode (System
+  default), separate strip themes (paper, green, amber), blue-teal icon with orange accent. Verified in Chromium at iPhone 13 and SE (details and what was not
   verified in `docs/phases/3-premium-ui.md`). Service worker cache `ekg-v3`.
 - Waiting for the owner's "push", then a real-iPhone check (Add to Home Screen icon,
   intro, full-screen strip, safe areas).

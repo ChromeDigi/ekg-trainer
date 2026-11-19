@@ -269,7 +269,7 @@
       : h("button", { type: "button", class: "btn primary block hero-cta", onclick: function () { goPractice("core"); } }, icon("i-play"), "Start with Core 5");
     v.append(h("div", { class: "card hero" }, monitor,
       h("div", { class: "hero-body" },
-        h("div", null, h("div", { class: "eyebrow", text: greeting() }),
+        h("div", null, h("div", { class: "eyebrow warm", text: greeting() }),
           h("h2", { text: st.total ? overall.pct + "% accuracy" : "Ready when you are" }),
           h("p", { class: "small muted", style: "margin:4px 0 0", text: st.total
             ? "Your last " + overall.n + " answers · " + st.total + " strips in all · next: " + setName
@@ -683,6 +683,35 @@
   document.getElementById("resetBtn").addEventListener("click", function () {
     if (confirm("Erase all progress on this phone?")) { progress.reset(); about.close(); show(current); }
   });
+  // Appearance: app theme and strip colors are separate choices.
+  const settings = document.getElementById("settingsDlg");
+  function renderSettings() {
+    const body = document.getElementById("settingsBody");
+    clear(body);
+    const f = progress.prefs();
+    const cur = { theme: f.theme || "system", strip: f.strip || "auto" };
+    const preview = stripCard(ecg.generate("nsr"), { tools: false });
+    const set = function (k, val) {
+      const g = progress.prefs(); g[k] = val; progress.savePrefs(g);
+      window.EKG.theme.apply({ theme: g.theme, strip: g.strip });
+    };
+    body.append(
+      h("div", { class: "setting" }, h("span", { class: "lbl", text: "App theme" }),
+        seg([{ value: "system", label: "System" }, { value: "light", label: "Light" }, { value: "dark", label: "Dark" }], cur.theme, function (x) { set("theme", x); }, "App theme")),
+      h("p", { class: "small muted", style: "margin:0", text: "System follows your iPhone: light by day, dark at night if you use automatic Dark Mode." }),
+      h("div", { class: "setting" }, h("span", { class: "lbl", text: "Strip colors" }),
+        seg([{ value: "auto", label: "Auto" }, { value: "paper", label: "Paper" }, { value: "green", label: "Green" }, { value: "amber", label: "Amber" }], cur.strip, function (x) { set("strip", x); }, "Strip colors")),
+      h("p", { class: "small muted", style: "margin:0", text: "Paper: red grid on light ECG paper. Green and Amber: dark monitor screen. Auto uses paper in the light theme and green in the dark theme. Same scale either way: 25 mm/s, 10 mm/mV." }),
+      preview.el);
+  }
+  document.getElementById("settingsBtn").addEventListener("click", function () { renderSettings(); settings.showModal(); });
+  settings.querySelector("[data-close]").addEventListener("click", function () { settings.close(); });
+  window.EKG.theme.onChange(function () {
+    widgets.forEach(function (w) { if (!w.el.isConnected) widgets.delete(w); else w.redraw(); });
+    if (expanded) S.draw(expandCanvas, expanded, {});
+    if (stopLive) { stopLive(); if (current === "home") renderHome(); }
+  });
+
   function startTour() {
     window.EKG.tour.open(document.getElementById("tourDlg"), {
       standalone: !!(navigator.standalone || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches)),

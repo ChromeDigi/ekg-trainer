@@ -39,3 +39,8 @@
 | 2026-11-19 | Intro screenshots are captured from the real app by a dev script, with sample progress data | Real UI, reproducible after UI changes, no personal data |
 | 2026-11-19 | Dev-only Playwright scripts live in `tools/`; the app stays dependency-free | Icons and screenshots are generated, but nothing new ships or loads at runtime |
 | 2026-11-19 | Full-screen strip turns the strip sideways instead of relying on rotation | Manifest locks portrait; sideways gives about 2.5x the size on a phone. Calipers stay on the normal view |
+| 2026-11-19 | Revised identity: light default, polished dark mode, user choice with System default (replaces "dark only") | Owner wants a premium healthcare-tech look; System still gives dark at night on an iPhone set to automatic |
+| 2026-11-19 | App theme and strip theme are separate settings (paper, green monitor, amber monitor) | Shell can look premium while strips stay clinically realistic |
+| 2026-11-19 | Healthcare-tech palette in our own blue and teal, not HMH brand colors or marks | Avoid implying endorsement in a public repo; CLAUDE.md bans HMH branding |
+| 2026-11-19 | Orange is an accent only, never a status color | Keeps green/red/amber meanings intact and the app calm |
+| 2026-11-19 | App icon: blue-teal tile, white trace, orange pen dot | Matches the new identity; still a real P-QRS-T and readable at 60 pt |

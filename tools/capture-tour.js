@@ -37,7 +37,7 @@ async function webp(page, png, file) {
 (async function () {
   fs.mkdirSync(OUT, { recursive: true });
   const browser = await chromium.launch();
-  const ctx = await browser.newContext(Object.assign({}, devices["iPhone 13"], { deviceScaleFactor: 2, serviceWorkers: "block" }));
+  const ctx = await browser.newContext(Object.assign({}, devices["iPhone 13"], { deviceScaleFactor: 2, serviceWorkers: "block", colorScheme: "light" }));
   await ctx.addInitScript(function (p) {
     localStorage.setItem("ekg.progress.v1", JSON.stringify(p));
     localStorage.setItem("ekg.prefs.v1", JSON.stringify({ ack: true, tour: 99, exam: { count: 20, seconds: 45, passMark: 85, lethal: true, showTimer: true } }));
@@ -61,13 +61,14 @@ async function webp(page, png, file) {
   await page.click('.tabs [data-view="practice"]');
   await page.selectOption(".select", "core");
   await page.waitForTimeout(200);
+  await page.click('#view-practice .strip-tools button:has-text("Measure")');
+  await page.waitForTimeout(200);
   const pos = await page.evaluate(function () {
     const s = window.__last, cv = document.querySelector("#view-practice canvas"), r = cv.getBoundingClientRect();
     const rs = s.beats.map(function (b) { return b.r; }).filter(function (t) { return t > 0.5 && t < s.seconds - 0.3; });
     const x = function (t) { return r.left + (0.4 + t) * 25 * cv._geo.pxmm; };
     return { y: r.top + r.height / 2, a: x(rs[0]), b: x(rs[1]), id: s.rhythm };
   });
-  await page.click('#view-practice .strip-tools button:has-text("Measure")');
   await page.mouse.click(pos.a, pos.y);
   await page.mouse.click(pos.b, pos.y);
   await page.click('#view-practice .choice[data-id="' + pos.id + '"]');

@@ -3,34 +3,48 @@
 Inspiration: a bedside cardiac monitor at night. Black screen, glowing trace, bright
 numbers, nothing else competing. Calm until something is wrong.
 
-## Colors (CSS variables on `:root`)
+## Visual direction (owner, 2026-11-19, revised)
+A premium healthcare-tech product: bright and clinical by day, calm and low-glare at night.
+Inspired by modern hospital software in general; no HMH logos, names, colors lifted from
+their brand guide, or anything that implies endorsement. The app shell and the ECG strip
+are themed separately so the shell can be polished while strips stay realistic.
 
-| Variable | Value | Use |
-|---|---|---|
-| `--bg` | `#07090a` | page background, near black |
-| `--surface` | `#11161a` | cards, panels |
-| `--surface-2` | `#1a2127` | pressed buttons, inputs |
-| `--surface-3` | `#222b32` | selected segment, ring track |
-| `--line-soft` | `#1b2329` | card borders, dividers inside cards |
-| `--line` | `#26313a` | borders, dividers |
-| `--text` | `#d7e0e5` | main text (not pure white, less glare) |
-| `--muted` | `#8f9eaa` | secondary text (5.2:1 or better on every surface) |
-| `--trace` | `#3cf08c` | EKG line, HR numbers (monitor green) |
-| `--grid-major` | `#3a1c22` | 5 mm grid lines (dim red, like strip paper in the dark) |
-| `--grid-minor` | `#21121a` | 1 mm grid lines |
-| `--spo2` | `#4cc9f0` | SpO2 in scenarios (monitor cyan) |
-| `--bp` | `#f2f2f2` | BP in scenarios |
-| `--ok` | `#3cf08c` | correct answer |
-| `--warn` | `#ffc53d` | warning, "not yet reviewed" tag |
-| `--danger` | `#ff5a69` | wrong answer, lethal rhythm |
-| `--accent` | `#7cc4ff` | links, focus ring, selected state |
-| `--trace-dim` / `--accent-dim` | 12 to 14% tints | icon chips, active tab pill, toggles |
+## App themes (CSS variables on `:root`, `data-theme="light|dark"`)
+Set by `js/theme.js` from `ekg.prefs.v1.theme`: `system` (default), `light`, `dark`.
 
-Never use color alone: correct / wrong also get an icon and a word. Text contrast at
-least 4.5:1 on its background.
+| Variable | Light | Dark | Use |
+|---|---|---|---|
+| `--bg` | `#f3f6f9` | `#090e13` | page |
+| `--surface` | `#ffffff` | `#111a22` | cards, sheets |
+| `--surface-2` / `-3` | `#f2f5f8` / `#e2e8ee` | `#17212b` / `#202c38` | inputs, tracks |
+| `--line` / `--line-soft` | `#d3dce5` / `#e3e9ef` | `#263442` / `#1a2530` | borders |
+| `--text` | `#0f1d2b` | `#e2e9ef` | main text |
+| `--muted` | `#536477` | `#94a4b4` | secondary text |
+| `--brand` | `#0a64c0` | `#5aa9ff` | active tab, links, focus, selected |
+| `--brand-2` | `#0a7f88` | `#35c6c9` | teal companion, brand mark |
+| `--brand-grad` | `#0a64c0 → #08757e` | `#2a6fd0 → #0f7a82` | primary buttons, bars, timer |
+| `--orange` / `--orange-text` | `#f26a1b` / `#a84508` | `#ff8a3d` / `#ff9c5c` | accent only: active-tab dot, intro progress, greeting, the icon's pen dot, future mastery glow |
+| `--ok` | `#0f7343` | `#3fd98a` | correct, accuracy 85%+ |
+| `--danger` | `#c42a3c` | `#ff6b78` | wrong, lethal |
+| `--warn` | `#8f5b00` | `#ffc53d` | "pending nurse review", low accuracy |
 
-Dark only in v1. A light "paper" theme (pink grid on white, for printing) is a maybe for
-phase 7.
+Rules: green and red mean right and wrong only; amber means caution only; orange is never a
+status color. Never color alone: correct / wrong also get an icon and a word. Every text pair
+is 4.5:1 or better in both themes (checked in step 2b; white on the button gradient 5.4+).
+
+## Strip themes (`data-strip="paper|green|amber"`), independent of the app theme
+`ekg.prefs.v1.strip`: `auto` (paper in light, green in dark), `paper`, `green`, `amber`.
+
+| | Paper | Green monitor | Amber monitor |
+|---|---|---|---|
+| background | `#fffafa` | `#050807` | `#070604` |
+| 1 mm / 5 mm grid | `#f7dbdf` / `#e79aa5` | `#0f1a16` / `#1c2c26` | `#1a150d` / `#2d2416` |
+| trace | `#15181c` ink | `#3cf08c` | `#ffb020` |
+| calipers | `#0a64c0` | `#7cc4ff` | `#7cc4ff` |
+
+Live sweeps (Home header, Monitor view) always look like a monitor: green, or amber when
+the amber strip theme is chosen. Scale never changes: 25 mm/s, 10 mm/mV.
+A high-contrast strip theme is a later option.
 
 ## Type
 - System fonts only (offline, no downloads): `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`.
@@ -79,7 +93,8 @@ phase 7.
 - No horizontal scroll at 360 px. Respect the iPhone safe areas.
 
 ## Motion
-- Short and quiet. View change: 320 ms fade and 8 px rise. Correct answer: one green pulse
+- Short and quiet. Primary buttons carry a slow sheen every few seconds; the intro icon floats
+  gently; the active tab gets an orange dot that pops in. View change: 320 ms fade and 8 px rise. Correct answer: one green pulse
   ring. Wrong answer: a 380 ms shake. Press: scale to 0.97. Progress rings and bars fill once.
   No confetti, no streak pressure.
 - `prefers-reduced-motion` turns every animation and transition off; live sweeps (Home
@@ -88,11 +103,13 @@ phase 7.
 ## Sound
 - Off by default. Optional soft beep per QRS in live mode, phase 7.
 
-## App icon (step 2b)
+## App icon (step 2b, revised)
 Drawn in code by `tools/make-icons.js` (one SVG master, PNGs rendered with the local
-Chromium): near-black with a faint vignette, dark red 1 mm / 5 mm grid, one luminous
-monitor-green lead II P-QRS-T with textbook proportions (1 unit = 1 ms: P 108, PR 164,
-QRS 84, QT 380), soft glow and a pale hot core. No text, no hearts, no branding.
+Chromium): blue-to-teal tile (`#0b5cb5 → #078a92`) with a soft highlight and faint white
+1 mm / 5 mm grid; one white lead II P-QRS-T with a cool glow and textbook proportions
+(1 unit = 1 ms: P 108, PR 164, QRS 84, QT 380), written by an orange "pen" dot like a
+monitor sweep, with the previous sweep dimmed past the erase gap. No text, no hearts,
+no branding.
 Files in `icons/`: `icon.svg`, `apple-touch-icon.png` (180), `icon-192.png`, `icon-512.png`,
 `icon-maskable.svg` / `icon-maskable-512.png` (complex scaled to 74% so it sits inside the
 80% safe circle, baseline still runs edge to edge), `favicon.svg` (rounded, thicker

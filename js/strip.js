@@ -30,7 +30,7 @@
   }
 
   function grid(ctx, w, h, pxmm, dpr) {
-    ctx.fillStyle = css("--paper");
+    ctx.fillStyle = css("--strip-bg");
     ctx.fillRect(0, 0, w, h);
     const lines = function (step, color, width) {
       ctx.strokeStyle = color;
@@ -40,8 +40,8 @@
       for (let y = 0; y <= h + 0.5; y += step) { const Y = Math.round(y * dpr) / dpr + 0.5 / dpr; ctx.moveTo(0, Y); ctx.lineTo(w, Y); }
       ctx.stroke();
     };
-    lines(pxmm, css("--grid-minor"), 1 / dpr);
-    lines(pxmm * 5, css("--grid-major"), Math.max(1, 1.5 / dpr * 1.5));
+    lines(pxmm, css("--strip-minor"), 1 / dpr);
+    lines(pxmm * 5, css("--strip-major"), Math.max(1, 1.5 / dpr * 1.5));
   }
 
   // Vertical placement: center the strip's range in the 4 mV window.
@@ -69,7 +69,7 @@
     const x = function (sec) { return (LEAD + sec) * SPEED * pxmm; };
 
     // Calibration pulse: 1 mV tall, 0.2 s wide.
-    ctx.strokeStyle = css("--trace");
+    ctx.strokeStyle = css("--strip-trace");
     ctx.lineWidth = Math.max(1.5, 2 * Math.min(1, pxmm / 2.2));
     ctx.lineJoin = "round";
     ctx.beginPath();
@@ -89,8 +89,8 @@
     ctx.stroke();
 
     // Time marks every second (ticks at top, labels underneath).
-    ctx.fillStyle = css("--muted");
-    ctx.strokeStyle = css("--muted");
+    ctx.fillStyle = css("--strip-label");
+    ctx.strokeStyle = css("--strip-label");
     ctx.lineWidth = 1;
     ctx.font = "12px " + css("--font-mono");
     ctx.textAlign = "center";
@@ -105,7 +105,7 @@
     // Calipers
     const cal = canvas._cal;
     if (cal && cal.on) {
-      ctx.strokeStyle = css("--accent");
+      ctx.strokeStyle = css("--strip-cal");
       ctx.lineWidth = 1.5;
       ctx.setLineDash([4, 3]);
       [cal.a, cal.b].forEach(function (t) {
@@ -164,7 +164,7 @@
     const cssH = Math.round(HEIGHT_MM * pxmm + LABEL_PX);
     const s = setup(canvas, cssW, cssH);
     const ctx = s.ctx;
-    const bg = css("--bg"), trace = css("--trace");
+    const bg = css("--mon-bg"), trace = css("--mon-trace");
     ctx.fillStyle = bg; ctx.fillRect(0, 0, cssW, cssH);
     const top = topMv(strip.samples);
     const y = function (mv) { return (top - mv) * GAIN * pxmm + LABEL_PX / 2; };
