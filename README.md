@@ -7,12 +7,16 @@ CSS and JavaScript, no dependencies.
 monitoring, diagnosis or treatment decisions. Not affiliated with any hospital or exam
 provider.
 
-## What's in it (phase 1)
-- 5 rhythms: normal sinus, sinus brady, sinus tach, atrial fibrillation, monomorphic VT
-- Learn: the 5-step approach and one card per rhythm, with paper or live monitor view
-- Practice: untimed, explanations built from the strip on screen, "why not" for each wrong choice
+## What's in it (phases 1 and 2)
+- 26 rhythms in 5 groups: sinus (incl. sinus arrhythmia, pause), atrial (PACs, flutter,
+  AFib, SVT), junctional (escape, accelerated, tach), ventricular (PVC patterns,
+  idioventricular, AIVR, VT, torsades, VF, asystole), AV blocks (1st, type I, type II, 3rd)
+- Learn: the 5-step approach and one card per rhythm, grouped, with paper or live monitor view
+- Practice: untimed, pick a rhythm set, optional "near the cutoffs" strips, explanations
+  built from the strip on screen, "why not" for each wrong choice (distractors are real lookalikes)
 - Missed: rhythms you miss stay here until you get them right twice in a row
-- Exam: timed, 10/20/25 strips, pass mark 80/85/90%, lethal rule, full review after
+- Exam: timed, all 26 or core 5, 10/20/25 strips, pass mark 80/85/90%, lethal rule (VT,
+  torsades, VF, asystole), optional near-cutoff strips, group breakdown, full review after
 - Progress: accuracy and speed per rhythm, this week vs before, exam history
 - Calipers and 2x zoom on every strip; works offline
 
@@ -24,8 +28,9 @@ Serve the folder with any static server, for example `python3 -m http.server 800
 then open http://localhost:8000. (Opening `index.html` directly works too, minus offline mode.)
 
 ## Test it
-`node tests/run.js` generates 1,500 strips per rhythm and checks each against its criteria
-and the answer key.
+`node tests/run.js` generates 800 strips per rhythm (a third of them near a cutoff where the
+rhythm has one) and checks each against its criteria, the answer key and rhythm-specific
+rules (about 3 million checks). `N=100 node tests/run.js` for a quick run.
 
 ## Docs
 `docs/plan.md` (roadmap), `docs/spec.md` (look), `docs/sources.md` (clinical references),

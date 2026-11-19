@@ -18,12 +18,43 @@ themselves when the nurse reviews.
 | S9 | 2018 ACC/AHA/HRS Bradycardia Guideline, https://pubmed.ncbi.nlm.nih.gov/30412709/ | Uses sinus bradycardia under 50 bpm (seen in secondary summaries; confirm in the guideline's definitions) |
 | S10 | McSharry et al. 2003, IEEE TBME 50(3):289-294; ECGSYN, https://physionet.org/content/ecgsyn/1.0.0/ | Sum-of-Gaussians P-QRS-T morphology approach used by the generator |
 
+| S11 | LITFL: First Degree Heart Block, https://litfl.com/first-degree-heart-block-ecg-library/ | PR > 200 ms (five small squares), delay without interruption |
+| S12 | LITFL: AV block 2nd degree Mobitz I, https://litfl.com/av-block-2nd-degree-mobitz-i-wenckebach-phenomenon/ | Progressive PR prolongation to a non-conducted P; PR longest before and shortest after the drop; P-P relatively constant; R-R shortens through the cycle; ratios 3:2, 4:3, 5:4 |
+| S13 | LITFL: AV block 2nd degree Mobitz II, https://litfl.com/av-block-2nd-degree-mobitz-ii-hay-block/ | Intermittent non-conducted P without PR prolongation; constant PR; P waves march through; R-R around the drop an exact multiple; about 75% broad QRS, 25% narrow; higher risk of progression |
+| S14 | LITFL: AV block fixed ratio blocks, https://litfl.com/av-block-2nd-degree-fixed-ratio-blocks/ | 2:1 / 3:1 can be Mobitz I or II; not always possible to tell |
+| S15 | LITFL: AV block 3rd degree, https://litfl.com/av-block-3rd-degree-complete-heart-block/ | Complete AV dissociation, independent atrial and ventricular rates; junctional or ventricular escape |
+| S16 | LITFL: Atrial Flutter, https://litfl.com/atrial-flutter-ecg-library/ | Atrial ~300 (200 to 400); inverted sawtooth in II, III, aVF (90% anticlockwise); 2:1 = 150, 3:1 = 100, 4:1 = 75; variable ratio irregular and may mimic AF |
+| S17 | LITFL: SVT, https://litfl.com/supraventricular-tachycardia-svt-ecg-library/ | Umbrella term, often used for AVNRT; narrow unless aberrancy; AVNRT 140 to 280 bpm, regular; P waves often hidden, else inverted after the QRS |
+| S18 | LITFL: Junctional Escape Rhythm, https://litfl.com/junctional-escape-rhythm-ecg-library/ | 40 to 60 bpm, narrow; naming: <40 junctional brady, 40 to 60 escape, 60 to 100 accelerated, >100 tach; ventricles 20 to 40 |
+| S19 | LITFL: Accelerated Junctional Rhythm, https://litfl.com/accelerated-junctional-rhythm-ajr/ | 60 to 100 bpm, narrow; retrograde P inverted in II, before, during or after the QRS; PR < 120 ms = junctional |
+| S20 | LITFL: PAC, https://litfl.com/premature-atrial-complex-pac/ | Abnormal P, usually normal QRS; post-ectopic pause not double the R-R; low atrial P inverted with PR >= 120 ms |
+| S21 | LITFL: PVC, https://litfl.com/premature-ventricular-complex-pvc-ecg-library/ | Broad QRS >= 120 ms, premature, discordant ST/T, usually full compensatory pause; unifocal/multifocal; bigeminy, couplet, NSVT 3 to 30 |
+| S22 | LITFL: Ventricular Fibrillation, https://litfl.com/ventricular-fibrillation-vf-ecg-library/ | Chaotic deflections of varying amplitude, no P/QRS/T, 150 to 500/min, coarse to fine with time, then asystole |
+| S23 | LITFL: Polymorphic VT and TdP, https://litfl.com/polymorphic-vt-and-torsades-de-pointes-tdp/ | TdP = polymorphic VT with QT prolongation, QRS twisting around the baseline |
+| S24 | LITFL: AIVR, https://litfl.com/accelerated-idioventricular-rhythm-aivr/ | Regular, wide, rate typically 50 to 120; <50 = ventricular escape, >110 = VT; reperfusion |
+| S25 | LITFL: Ventricular Escape Rhythm, https://litfl.com/ventricular-escape-rhythm-ecg-library/ | 20 to 40 bpm, QRS >= 120 ms |
+| S26 | LITFL: Sinus Arrhythmia, https://litfl.com/sinus-arrhythmia-ecg-library/ | P-P varies > 120 ms, cyclical with breathing; constant P morphology and PR |
+| S27 | LITFL: Sinoatrial Exit Block, https://litfl.com/sinoatrial-exit-block-ecg-library/ | Sinus pause/arrest = failure of impulse generation; SA exit block type II = pause an exact multiple of P-P |
+| S28 | LITFL: Monomorphic VT, https://litfl.com/ventricular-tachycardia-monomorphic-ecg-library/ | Regular broad complex tachycardia, uniform QRS |
+| S29 | StatPearls: Asystole, https://www.ncbi.nlm.nih.gov/books/NBK430866/ | No waveform, only an isoelectric line, no P, QRS or T; distinguish from fine VF; non-shockable. **Read from a search-result excerpt only**: the page itself showed a reCAPTCHA to this environment |
+
+S11 to S28 were fetched and read directly from litfl.com on 2026-11-19. NCBI Bookshelf,
+PMC and AHA Journals returned bot checks to the build environment that day.
+
 ## Generator choices that are not shown to the user as facts
 - AFib f-wave frequency 6 to 9 Hz (360 to 540/min): inside the commonly taught 350 to
   600/min, not verified against a primary source this session.
 - QT scaled with rate using the Bazett form, QTc 0.38 to 0.43 s.
-- Generated rates keep a margin from cutoffs (NSR 62 to 98, brady 40 to 54, tach 106 to
-  148, VT 140 to 210) so no strip is borderline. Borderline strips are a later choice.
+- Normal strips keep a margin from cutoffs; borderline ("edge") strips sit just inside one,
+  and the generator re-draws until the exact rate, the 1500 rule and the rounded numbers
+  on screen all agree with the category.
+- Phase 2 choices: flutter waves 260 to 320/min; SVT 155 to 220; torsades 190 to 250 with a
+  3.6 to 5 s twist cycle; VF components 4 to 7 Hz; "fine" vs "coarse" VF and the asystole
+  amplitude are drawing choices, no numeric cutoff is shown to the user; Wenckebach PR
+  starts 0.16 to 0.21 s and grows by shrinking steps; PVC coupling 0.56 to 0.68 of the R-R;
+  PAC coupling 0.62 to 0.74 of the P-P; sinus pause 1.6 to 1.85 or 2.3 to 2.7 P-P (never an
+  exact multiple, so it can't be SA exit block); AIVR generated 56 to 94 and never 100 to 110
+  because references disagree there.
 
 ## Still to add
 - AHA ACLS adult algorithms (phase 5 "what now").

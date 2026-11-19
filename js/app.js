@@ -109,6 +109,8 @@
       ms != null ? h("span", { class: "time", text: secs(ms) }) : null
     ));
     if (R.lethal) box.append(h("p", { class: "small", style: "margin:6px 0 0" }, h("span", { class: "tag danger", text: "Lethal rhythm" })));
+    const edge = quiz.edgeNote(strip);
+    if (edge) box.append(h("p", { class: "note", text: edge }));
 
     box.append(h("div", { class: "section-title", text: "This strip" }));
     const dl = h("dl", { class: "findings" });
@@ -169,62 +171,86 @@
     v.append(h("div", { class: "card" }, h("h2", { text: "Same 5 steps, every strip" }), steps,
       h("p", { class: "small muted", style: "margin:10px 0 0", text: "Paper at 25 mm/s: 1 small box = 0.04 s, 1 big box = 0.20 s, a 6-second strip = 30 big boxes. Height: 10 small boxes = 1 mV (the square calibration pulse at the start)." })));
 
-    rhythms.list.forEach(function (R) {
-      const w = stripCard(ecg.generate(R.id), { tools: true });
-      let liveOn = false, liveStop = null;
-      const liveCanvas = h("canvas", { role: "img", "aria-label": "Live monitor view" });
-      const liveWrap = h("div", { class: "strip-wrap", hidden: true }, liveCanvas);
-      w.el.insertBefore(liveWrap, w.el.firstChild);
-      const paperWrap = w.canvas.parentElement;
-      const liveBtn = toggleBtn("Monitor view", false, function (on) {
-        if (on) {
-          if (stopLive) stopLive();
-          liveOn = true;
-          liveWrap.hidden = false;
-          paperWrap.hidden = true;
-          liveStop = S.live(liveCanvas, ecg.generate(R.id, { seconds: 60 }));
-          stopLive = function () {
-            if (liveStop) liveStop();
-            liveStop = null; liveOn = false; stopLive = null;
-            liveWrap.hidden = true; paperWrap.hidden = false;
-            liveBtn.setAttribute("aria-pressed", "false");
-            w.redraw();
-          };
-        } else if (liveOn && stopLive) stopLive();
+    v.append(h("p", { class: "small muted", text: "Tap a group to open it. Every card's strip is new each time." }));
+    rhythms.groups.forEach(function (g) {
+      const members = rhythms.list.filter(function (R) { return R.group === g.id; });
+      const d = h("details", { class: "card learn-group" },
+        h("summary", null, h("span", { class: "h2like", text: g.name }), h("span", { class: "small muted", text: members.length + " rhythms" })));
+      let built = false;
+      d.addEventListener("toggle", function () {
+        if (!d.open || built) return;
+        built = true;
+        members.forEach(function (R) { d.append(learnCard(R)); });
       });
-      const table = h("table", { class: "criteria" });
-      [["Rate", R.teach.rate], ["Regularity", R.teach.regularity], ["P waves", R.teach.p], ["PR", R.teach.pr], ["QRS", R.teach.qrs]]
-        .forEach(function (r) { table.append(h("tr", null, h("th", { text: r[0] }), h("td", { text: r[1] }))); });
-      const card = h("div", { class: "card" },
-        h("div", { class: "row-between" }, h("h2", { text: R.name }), R.lethal ? h("span", { class: "tag danger", text: "Lethal" }) : null),
-        h("div", { style: "margin:12px -14px 0" }, w.el),
-        h("div", { class: "row", style: "margin-top:10px" },
-          h("button", { type: "button", class: "btn small", text: "New example", onclick: function () { if (liveOn && stopLive) stopLive(); w.set(ecg.generate(R.id)); } }),
-          liveBtn),
-        table,
-        h("p", { class: "small", style: "margin:10px 0 0", text: R.tellApart }),
-        R.note ? h("p", { class: "note", text: R.note }) : null,
-        h("div", { class: "row", style: "margin-top:10px" }, reviewTag()),
-        h("ul", { class: "sources" }, R.sources.map(function (sid) {
-          const s = rhythms.sources[sid];
-          return h("li", null, h("a", { href: s.url, target: "_blank", rel: "noopener", text: s.label }));
-        }))
-      );
-      w.el.style.border = "0"; w.el.style.background = "transparent";
-      v.append(card);
+      v.append(d);
     });
+  }
+  function learnCard(R) {
+    const w = stripCard(ecg.generate(R.id), { tools: true });
+    let liveOn = false, liveStop = null;
+    const liveCanvas = h("canvas", { role: "img", "aria-label": "Live monitor view" });
+    const liveWrap = h("div", { class: "strip-wrap", hidden: true }, liveCanvas);
+    w.el.insertBefore(liveWrap, w.el.firstChild);
+    const paperWrap = w.canvas.parentElement;
+    const liveBtn = toggleBtn("Monitor view", false, function (on) {
+      if (on) {
+        if (stopLive) stopLive();
+        liveOn = true;
+        liveWrap.hidden = false;
+        paperWrap.hidden = true;
+        liveStop = S.live(liveCanvas, ecg.generate(R.id, { seconds: 60 }));
+        stopLive = function () {
+          if (liveStop) liveStop();
+          liveStop = null; liveOn = false; stopLive = null;
+          liveWrap.hidden = true; paperWrap.hidden = false;
+          liveBtn.setAttribute("aria-pressed", "false");
+          w.redraw();
+        };
+      } else if (liveOn && stopLive) stopLive();
+    });
+    const table = h("table", { class: "criteria" });
+    [["Rate", R.teach.rate], ["Regularity", R.teach.regularity], ["P waves", R.teach.p], ["PR", R.teach.pr], ["QRS", R.teach.qrs]]
+      .forEach(function (r) { table.append(h("tr", null, h("th", { text: r[0] }), h("td", { text: r[1] }))); });
+    const card = h("div", { class: "learn-card" },
+      h("div", { class: "row-between" }, h("h3", { text: R.name }), R.lethal ? h("span", { class: "tag danger", text: "Lethal" }) : null),
+      h("div", { style: "margin:12px -14px 0" }, w.el),
+      h("div", { class: "row", style: "margin-top:10px" },
+        h("button", { type: "button", class: "btn small", text: "New example", onclick: function () { if (liveOn && stopLive) stopLive(); w.set(ecg.generate(R.id)); } }),
+        liveBtn),
+      table,
+      h("p", { class: "small", style: "margin:10px 0 0", text: R.tellApart }),
+      R.note ? h("p", { class: "note", text: R.note }) : null,
+      h("div", { class: "row", style: "margin-top:10px" }, reviewTag()),
+      h("ul", { class: "sources" }, R.sources.map(function (sid) {
+        const s = rhythms.sources[sid];
+        return h("li", null, h("a", { href: s.url, target: "_blank", rel: "noopener", text: s.label }));
+      }))
+    );
+    w.el.style.border = "0"; w.el.style.background = "transparent";
+    return card;
   }
 
   // ---------- Practice ----------
-  const pr = { mode: "all", strip: null, shown: [], at: 0, answered: false, n: 0, ok: 0, last: null, widget: null };
+  const pr = { mode: "all", edge: false, strip: null, shown: [], at: 0, answered: false, n: 0, ok: 0, last: null, widget: null };
   let practiceHeader = null;
   function renderPracticeHeader() {
     if (!practiceHeader) return;
     const n = progress.reviewIds().length;
     const sc = practiceHeader.querySelector(".mono");
     if (sc) sc.textContent = pr.n ? pr.ok + "/" + pr.n : "";
-    const btn = practiceHeader.querySelectorAll(".seg button")[1];
-    if (btn) btn.textContent = "Missed" + (n ? " (" + n + ")" : "");
+    const opt = practiceHeader.querySelector("option[value=review]");
+    if (opt) opt.textContent = "Missed rhythms" + (n ? " (" + n + ")" : "");
+  }
+  function setIds(id) {
+    const st = rhythms.sets.find(function (x) { return x.id === id; });
+    return st ? st.ids : ALL;
+  }
+  function setPicker() {
+    const sel = h("select", { class: "select", "aria-label": "Rhythm set", onchange: function () { pr.mode = sel.value; pr.last = null; nextPractice(); } });
+    rhythms.sets.forEach(function (st) { sel.append(h("option", { value: st.id, text: st.name })); });
+    sel.append(h("option", { value: "review", text: "Missed rhythms" }));
+    sel.value = pr.mode;
+    return sel;
   }
   function nextPractice() {
     const v = views.practice;
@@ -233,12 +259,12 @@
       h("div", { class: "row-between" },
         h("h2", { text: "Practice" }),
         h("span", { class: "mono muted small", "aria-label": "Session score" })),
-      seg([{ value: "all", label: "All rhythms" }, { value: "review", label: "Missed" }], pr.mode, function (m) { pr.mode = m; pr.last = null; nextPractice(); }, "Practice set")
+      h("div", { class: "row" }, setPicker(), toggleBtn("Near the cutoffs", pr.edge, function (on) { pr.edge = on; nextPractice(); }))
     );
     v.append(practiceHeader);
     renderPracticeHeader();
 
-    const ids = pr.mode === "review" ? progress.reviewIds() : ALL;
+    const ids = pr.mode === "review" ? progress.reviewIds() : setIds(pr.mode);
     if (!ids.length) {
       pr.strip = { empty: true };
       v.append(h("div", { class: "card empty" },
@@ -250,8 +276,8 @@
     }
     const id = quiz.pickRhythm(progress.weights(ids), Math.random, pr.last);
     pr.last = id;
-    pr.strip = ecg.generate(id);
-    pr.shown = quiz.choices(id);
+    pr.strip = ecg.generate(id, { borderline: pr.edge });
+    pr.shown = quiz.choices(id, Math.random, 4, pr.mode === "review" ? null : setIds(pr.mode));
     pr.answered = false;
     pr.widget = stripCard(pr.strip);
     v.append(pr.widget.el);
@@ -293,20 +319,24 @@
     const v = views.exam;
     clear(v);
     const f = progress.prefs();
-    const e = Object.assign({}, f.exam);
+    const e = Object.assign({ set: "all", edge: false }, f.exam);
     const save = function () { f.exam = e; progress.savePrefs(f); };
     const last = progress.stats(ALL).exams[0];
     v.append(h("div", { class: "card stack" },
       h("h2", { text: "Exam simulation" }),
       h("p", { class: "small muted", text: "Timed, no feedback until the end, like a hospital rhythm test. Not a copy of any specific exam." }),
+      h("div", { class: "setting" }, h("span", { class: "lbl", text: "Rhythms" }),
+        seg([{ value: "all", label: "All 26" }, { value: "core", label: "Core 5" }], e.set, function (x) { e.set = x; save(); }, "Rhythm set")),
       h("div", { class: "setting" }, h("span", { class: "lbl", text: "Strips" }),
         seg([10, 20, 25].map(function (n) { return { value: n, label: String(n) }; }), e.count, function (x) { e.count = x; save(); }, "Number of strips")),
       h("div", { class: "setting" }, h("span", { class: "lbl", text: "Time per strip" }),
         seg([30, 45, 60].map(function (n) { return { value: n, label: n + " s" }; }), e.seconds, function (x) { e.seconds = x; save(); }, "Time per strip")),
       h("div", { class: "setting" }, h("span", { class: "lbl", text: "Pass mark" }),
         seg([80, 85, 90].map(function (n) { return { value: n, label: n + "%" }; }), e.passMark, function (x) { e.passMark = x; save(); }, "Pass mark")),
-      h("div", { class: "setting" }, h("span", { class: "lbl", text: "Lethal rule: must get every lethal rhythm (VT) right to pass" }),
+      h("div", { class: "setting" }, h("span", { class: "lbl", text: "Lethal rule: must get every lethal strip (VT, torsades, VF, asystole) right to pass" }),
         seg([{ value: true, label: "On" }, { value: false, label: "Off" }], e.lethal, function (x) { e.lethal = x; save(); }, "Lethal rule")),
+      h("div", { class: "setting" }, h("span", { class: "lbl", text: "Near-cutoff strips (about 1 in 4 sits close to a rate, PR or QRS cutoff)" }),
+        seg([{ value: false, label: "Off" }, { value: true, label: "Mix in" }], e.edge, function (x) { e.edge = x; save(); }, "Near-cutoff strips")),
       h("div", { class: "setting" }, h("span", { class: "lbl", text: "Countdown (the timer still runs when hidden)" }),
         seg([{ value: true, label: "Show" }, { value: false, label: "Hide" }], e.showTimer, function (x) { e.showTimer = x; save(); }, "Show countdown")),
       h("button", { type: "button", class: "btn primary block", text: "Start exam", onclick: function () { startExam(e); } })
@@ -318,7 +348,7 @@
     if (last) v.append(h("p", { class: "small muted", text: "Last exam: " + last.pct + "% (" + (last.passed ? "pass" : "not yet") + "), " + new Date(last.at).toLocaleDateString() }));
   }
   function startExam(cfg) {
-    Object.assign(exam, { state: "run", cfg: Object.assign({}, cfg), plan: quiz.examPlan(cfg.count), i: 0, results: [], startedAt: Date.now() });
+    Object.assign(exam, { state: "run", cfg: Object.assign({}, cfg), plan: quiz.examPlan(cfg.count, Math.random, setIds(cfg.set || "all")), i: 0, results: [], startedAt: Date.now() });
     examQuestion();
   }
   function stopTimer() { if (exam.timer) { clearInterval(exam.timer); exam.timer = 0; } }
@@ -327,8 +357,8 @@
     const v = views.exam;
     clear(v);
     const id = exam.plan[exam.i];
-    exam.strip = ecg.generate(id);
-    exam.shown = quiz.choices(id);
+    exam.strip = ecg.generate(id, { borderline: !!exam.cfg.edge && Math.random() < 0.25 });
+    exam.shown = quiz.choices(id, Math.random, 4, setIds(exam.cfg.set || "all"));
     exam.answered = false;
     const total = exam.cfg.seconds * 1000;
     const bar = h("i");
@@ -378,7 +408,7 @@
     const sc = quiz.scoreExam(exam.results, c.passMark, c.lethal);
     const avg = exam.results.reduce(function (s, r) { return s + r.ms; }, 0) / exam.results.length;
     progress.addSession({ mode: "exam", total: sc.total, correct: sc.correct, pct: sc.pct, passed: sc.passed,
-      passMark: c.passMark, lethal: c.lethal, seconds: c.seconds, avgMs: Math.round(avg) });
+      passMark: c.passMark, lethal: c.lethal, seconds: c.seconds, avgMs: Math.round(avg), set: c.set || "all" });
     const v = views.exam;
     clear(v);
     const reasons = [];
@@ -389,6 +419,9 @@
         h("div", null, h("div", { class: "score-big", text: sc.pct + "%" }), h("div", { class: "small muted", text: sc.correct + " of " + sc.total + " · avg " + secs(avg) + " per strip" })),
         h("span", { class: "tag " + (sc.passed ? "accent" : "warn"), text: sc.passed ? "Pass" : "Not yet" })),
       reasons.length ? h("ul", { class: "whynot" }, reasons.map(function (r) { return h("li", { text: r }); })) : h("p", { class: "small", text: "Pass mark " + c.passMark + "%" + (c.lethal ? ", every lethal strip correct." : ".") }),
+      sc.groups.length > 1 ? h("table", { class: "table" },
+        h("tr", null, h("th", { text: "Group" }), h("th", { class: "num", text: "Right" })),
+        sc.groups.map(function (g) { return h("tr", null, h("td", { text: g.name }), h("td", { class: "num", text: g.correct + " / " + g.total })); })) : null,
       h("div", { class: "row" },
         h("button", { type: "button", class: "btn primary", text: "New exam", onclick: function () { exam.state = "setup"; renderExamSetup(); } }),
         progress.reviewIds().length ? h("button", { type: "button", class: "btn", text: "Practice my misses", onclick: function () { pr.mode = "review"; pr.strip = null; show("practice"); } }) : null)
@@ -432,7 +465,10 @@
       tile("Avg time, correct", st.weekAvgMs ? secs(st.weekAvgMs) : "–", "last 7 days")));
     const t = h("table", { class: "table" },
       h("tr", null, h("th", { text: "Rhythm" }), h("th", { class: "num", text: "Last 20" }), h("th", { class: "num", text: "Speed" }), h("th", { class: "num", text: "Seen" })));
+    let lastGroup = null;
     st.per.forEach(function (p) {
+      const g = rhythms.byId[p.id].group;
+      if (g !== lastGroup) { lastGroup = g; t.append(h("tr", { class: "group-row" }, h("th", { colspan: "4", text: rhythms.groups.find(function (x) { return x.id === g; }).name }))); }
       t.append(h("tr", null,
         h("td", null, rhythms.byId[p.id].short, p.inReview ? h("span", { class: "tag warn", style: "margin-left:6px", text: "review" }) : null),
         h("td", { class: "num", text: fmt(p.pct) }),

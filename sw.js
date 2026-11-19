@@ -1,6 +1,6 @@
 /* Offline support: serve from cache, refresh the cache in the background.
    Bump VERSION whenever app files change so phones pick up the update. */
-const VERSION = "ekg-v1";
+const VERSION = "ekg-v2";
 const FILES = [
   "./", "index.html", "styles.css", "manifest.webmanifest",
   "js/rhythms.js", "js/ecg.js", "js/quiz.js", "js/strip.js", "js/progress.js", "js/app.js"

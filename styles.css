@@ -223,3 +223,16 @@ dialog.sheet h3 { margin: 14px 0 4px; }
   .feedback { animation: none; }
   .timerbar > i { transition: none; }
 }
+
+/* Phase 2: grouped Learn, set picker, group rows */
+.learn-group > summary { list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
+.learn-group > summary::-webkit-details-marker { display: none; }
+.learn-group > summary::after { content: "▸"; color: var(--muted); }
+.learn-group[open] > summary::after { content: "▾"; }
+.h2like { font-size: 20px; font-weight: 600; }
+.learn-card { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 14px; }
+.select {
+  min-height: 44px; flex: 1 1 180px; min-width: 0; padding: 8px 12px; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--surface-2); color: var(--text); font: inherit; font-size: 16px;
+}
+.table tr.group-row th { padding-top: 14px; color: var(--accent); }

@@ -3,28 +3,31 @@
 Updated 2026-11-19. Read CLAUDE.md, then docs/plan.md, then this.
 
 ## Done
-- Phase 1 trainer (5 rhythms) built, tested (`node tests/run.js`, ~260k checks) and live:
-  https://chromedigi.github.io/ekg-trainer/ (GitHub Pages, branch main, root).
-- Live site verified in Chromium as iPhone 13 / SE / landscape: all files 200, no errors,
-  no horizontal scroll, offline reload works. WebKit isn't installed in the cloud box.
-- Future modules documented in `docs/future/` (3D campus with corrected priorities and
-  the official map checked, adaptive learning with FSRS, photo import, cinematic intro,
-  iPhone onboarding). Roadmap in docs/plan.md.
+- Phase 1 trainer live at https://chromedigi.github.io/ekg-trainer/. Owner tested it on a
+  real iPhone: nothing to fix.
+- Phase 2 (difficult rhythms) built and committed: 26 rhythms, lookalike distractors,
+  near-cutoff strips, exam with all lethal rhythms and a group breakdown. Spec and status
+  in `docs/phases/2-difficult-rhythms.md`. `node tests/run.js` passes about 3 million checks.
+- Future modules documented in `docs/future/`. Roadmap in docs/plan.md.
 
 ## In progress
-- Owner testing on a real iPhone (checklist: install via Add to Home Screen, airplane
-  mode, Measure drag doesn't scroll the page, Zoom swipe, exam timer, grid readable).
+- Phase 2 waits for the owner's push. After the push: verify the live site (files 200,
+  click-through at iPhone width, offline reload; service worker cache is now `ekg-v2`).
 
 ## Next
-- Fix anything from the iPhone test, then step 2 (difficult rhythms). Prompt in
-  docs/prompts.md.
+- Nurse review of the 26 rhythm cards (all `review: "pending"`).
+- Step 3 (adaptive learning, FSRS). Prompt in docs/prompts.md.
 
 ## Environment notes
-- Cloud environment "ChromeDigi apps" allows chromedigi.github.io, litfl.com, NCBI, PMC,
-  AHA Journals and the HMH site, so clinical sources can be read directly now.
+- litfl.com fetches work with plain curl. Use the exact slugs from `docs/sources.md`;
+  wrong slugs return 403, not 404.
+- NCBI Bookshelf, PMC and AHA Journals answered with reCAPTCHA / Cloudflare checks on
+  2026-11-19 (curl and the web-fetch agent). StatPearls asystole (S29) is cited from a
+  search excerpt only; re-read it in a browser during the nurse review.
 - GitHub's Pages API is blocked by the session proxy; Pages settings are changed by the owner.
 - Owner approves every push (send a phone notification naming the change).
 
 ## Open questions
 - Which exam HUMC uses, its format and pass mark.
+- After phase 2: which rhythms feel wrong or too easy on the real monitor.
 - Campus: is "the Pavilion" Schlesinger Pavilion; St. John height; real fountain location.

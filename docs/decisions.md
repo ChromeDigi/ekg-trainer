@@ -24,3 +24,10 @@
 | 2026-11-19 | Photo import is optional, on-device, opt-in for any external AI | Privacy promise; patient data must never enter the app |
 | 2026-11-19 | Cinematic intro and iPhone walkthrough are separate; both made only from finished features | No advertising features that don't exist |
 | 2026-11-19 | The nurse's name stays out of the repo | Public repo; CLAUDE.md bans staff names |
+| 2026-11-19 | Phase 2: 26 rhythms; paced rhythms deferred to the post-op side-track | Paced strips need their own sources and the CTICU context; the exam-critical set comes first |
+| 2026-11-19 | Answer key as feature sets (rate, regularity pattern, atrial activity, PR behavior, QRS, ectopy, shape) | Scales to 26 rhythms; every "why not" names the exact feature that fails; tests prove each pair of rhythms is told apart on every strip |
+| 2026-11-19 | Generator builds events first (P waves, conduction, drops, ectopics), then draws | Blocks and ectopy need P waves that aren't tied 1:1 to QRS complexes |
+| 2026-11-19 | Borderline strips are opt-in (Practice toggle, exam "Mix in" about 1 in 4) | Practice the cutoffs on purpose, without making the default drill feel unfair |
+| 2026-11-19 | No 2:1 AV block question | LITFL: type I vs II often can't be told apart at 2:1; asking would teach guessing |
+| 2026-11-19 | AIVR 50 to 100, VT over 100, generator avoids 100 to 110 | LITFL AIVR (50 to 120, VT over 110) and StatPearls VT (over 100) disagree; the app avoids the zone and says so on the card |
+| 2026-11-19 | Exam prefs get optional `set` and `edge` fields without a key bump | Additive with defaults, so old `ekg.prefs.v1` data still loads unchanged |
