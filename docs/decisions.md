@@ -50,3 +50,7 @@
 | 2026-11-19 | `ekg.progress.v2` built by replaying v1 answers; v1 left untouched; answer cap raised to 5000 | No progress lost, and trends can be rebuilt by replay |
 | 2026-11-19 | Mastery: recall 0.90+, stability 21+ days, right on 3+ days, last correct not slow, no miss in last 5. Marked as a draft | Mastery must mean repeated recall over time, not a lucky streak; the nurse tunes it |
 | 2026-11-19 | Five tabs kept: Today lives on Home, Mastery/Trends/Exams are a switch inside Progress | A sixth tab doesn't fit 360 px one-handed |
+| 2026-11-19 | Three.js approved as the first dependency, vendored as one file, loaded only by the separate campus page | Smooth orbit, pinch and lighting on iPhone without writing a 3D engine; the trainer stays dependency-free |
+| 2026-11-19 | "The Pavilion" (priority 1B) is Schlesinger Pavilion (owner) | Only other "Pavilion" in the complex on the 2024 map; height still unverified |
+| 2026-11-19 | Flubber 0.4.2 vendored in `vendor/flubber/` (owner asked), not loaded by any page yet | Ready for shape-morph animations; no runtime cost until a screen uses it. Last release 2022, so re-check before use |
+| 2026-11-19 | Pixelorama: owner installs it on their own computer if wanted; nothing in the repo | Desktop pixel-art editor; the campus aims for realism, so Blender stays the modeling tool |

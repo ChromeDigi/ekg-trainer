@@ -51,8 +51,9 @@ schematic with north up; it shows positions and adjacency, not exact sizes.
   and Second St: map.
 - Height of St. John: **not verified** (owner says about 6 stories).
 
-### 1B. "The Pavilion" (about 9 stories, per owner)
-- Not resolved. Candidates found:
+### 1B. "The Pavilion" = Schlesinger Pavilion (owner, 2026-11-19)
+- Owner confirmed Schlesinger Pavilion. Height still not verified (owner says about 9
+  stories). Candidates that were considered:
   - **Schlesinger Pavilion**: the only other building labeled "Pavilion" in the complex
     on the 2024 map, at the south end by Second St. Height not found anywhere.
   - **George Link Jr. Pavilion**: listed as a campus building (houses the Banta Lobby,
@@ -87,7 +88,7 @@ schematic with north up; it shows positions and adjacency, not exact sizes.
 ## Ambiguity log
 | # | Question | What the sources say | Who can settle it | Until then |
 |---|---|---|---|---|
-| A1 | Which building is "the Pavilion"? | Schlesinger Pavilion is the only map "Pavilion" besides Helena Theurer; George Link Jr. Pavilion exists per an old Wikipedia copy; Medical Plaza is reported as nine stories, the height the owner remembers | Nurse | Leave 1B out of the blockout, or block Schlesinger as a grey box marked "unconfirmed" |
+| A1 | ~~Which building is "the Pavilion"?~~ Settled: Schlesinger Pavilion (owner) | Schlesinger Pavilion is the only map "Pavilion" besides Helena Theurer; George Link Jr. Pavilion exists per an old Wikipedia copy; Medical Plaza is reported as nine stories, the height the owner remembers | Nurse | Leave 1B out of the blockout, or block Schlesinger as a grey box marked "unconfirmed" |
 | A2 | How tall is St. John? | Nothing found | Nurse (count floors), own photo, or lidar | Use 6 stories (owner's estimate), marked as an estimate in the code |
 | A3 | Which way does 5 St. John face? | Nothing found | Nurse | No unit-level detail |
 | A4 | Is there a fountain, and where? | Map shows an oval island in the main entrance loop off Prospect Ave; nothing says it is a fountain | Nurse or a street-level photo | No fountain |
@@ -115,5 +116,6 @@ schematic with north up; it shows positions and adjacency, not exact sizes.
 
 ## Status
 - Research and ambiguity log: done for what public, allowed sources give.
-- Blockout: not started. Waiting on (1) owner approval of Three.js, (2) OSM footprints,
-  (3) the nurse's answers to A1 and A2.
+- Three.js approved; 1B = Schlesinger Pavilion (owner, 2026-11-19).
+- Blockout: not started. Waiting on OSM footprints; St. John height (A2) stays an
+  estimate until the nurse confirms.
