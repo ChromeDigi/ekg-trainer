@@ -23,10 +23,10 @@ his coworkers. Details in `docs/research.md`.
 | # | Phase | What ships | Status |
 |---|---|---|---|
 | 0 | Foundation | CLAUDE.md, plan, spec, research, decisions, sources | done |
-| 1 | Strip engine | Code-drawn lead II strips on a dark grid, live sweep, 6-second strip; 5 starter rhythms; a browse screen to eyeball them | next |
-| 2 | Basics drill | Full basic rhythm set (~28), 5-step method (rate, regularity, P, PR, QRS), multiple choice, instant explanation, calipers; offline + Add to Home Screen | |
-| 3 | Exam mode | Timed test like a hospital exam: set count, 80/85/90% pass mark, 100% lethal rule, review of misses | |
-| 4 | Weak spots | Progress per rhythm, misses come back more often, short daily set | |
+| 1 | Core trainer (5 rhythms) | Strip engine, Learn, untimed Practice with measured explanations, Missed review, timed Exam, Progress, calipers, offline. Widened on owner request; see `docs/phases/1-core-trainer.md` | done |
+| 2 | Full rhythm set | Rest of the basic set below, lookalike pairs (SVT vs sinus tach, flutter vs AFib), borderline strips, nurse feedback round | next |
+| 3 | Exam realism | Exam formats once the HUMC test is known (fill-in vs multiple choice, interval questions), optional 5-choice mode | |
+| 4 | Weak spots + | Short daily set, streaks, speed targets per rhythm | |
 | 5 | Stepdown "what now" | Strip + vitals + one line of context, then stable vs unstable and next action; every answer sourced, reviewed by the nurse | |
 | 6 | Post-op heart surgery | Epicardial pacing modes (AAI, VVI, DDD), failure to capture / sense, oversensing, post-op AFib | |
 | 7 | Polish + share | Icon (ChatGPT prompt in spec), name, GitHub Pages link, feedback round with the nurse | |

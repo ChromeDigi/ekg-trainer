@@ -31,6 +31,10 @@ full-time nights. Cross-training in the CTICU, not transferring.
   score. Strips are usually 6-second lead II.
 - He has passed it at several hospitals, so basic rhythm ID alone will bore him. The app
   has to go past it.
+- Update 2026-11-19: he is retaking a dysrhythmia exam during orientation. He knows the
+  rhythms; test anxiety is the problem. Provider unconfirmed (HUMC internal "Dysrhythmia
+  Challenge", HealthStream, Relias/Prophecy or other), so the app teaches general
+  interpretation and practice under a clock, not a copy of any exam.
 
 ## Similar apps (where this one can be better)
 

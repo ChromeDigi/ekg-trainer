@@ -1,0 +1,11 @@
+{
+  "name": "EKG Trainer",
+  "short_name": "EKG Trainer",
+  "description": "Rhythm strip practice for telemetry nurses. Educational simulation only.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07090a",
+  "theme_color": "#07090a"
+}

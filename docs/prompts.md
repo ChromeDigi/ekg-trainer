@@ -9,10 +9,11 @@ live sweep, 5 starter rhythms (normal sinus, sinus brady, sinus tach, atrial fib
 and a simple browse screen. Add sources for those 5 to docs/sources.md. Run it at
 360 px wide and show me screenshots."
 
-## Phase 2: Basics drill
-"Start phase 2. Phase doc first. Add the full basic rhythm set from docs/plan.md with
-sources, the multiple-choice drill with the 5-step explanation, calipers, and offline +
-Add to Home Screen. Screenshot at phone width."
+## Phase 2: Full rhythm set
+"Start phase 2. Phase doc first. Add the rest of the basic rhythm set in docs/plan.md,
+lookalikes first (SVT, atrial flutter, junctional, PVCs, heart blocks, VF, asystole,
+torsades), each with sources in docs/sources.md, generator tests, and the nurse's feedback
+from phase 1. Screenshot at phone width."
 
 ## Phase 3: Exam mode
 "Start phase 3. Phase doc first. Timed exam with a set count, selectable pass mark

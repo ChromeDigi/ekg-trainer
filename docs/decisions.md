@@ -11,3 +11,8 @@
 | 2026-11-19 | Dark monitor look, dark only in v1 | Night shift, low glare, feels like the bedside monitor |
 | 2026-11-19 | Every clinical fact cites a source; nurse reviews before "reviewed" | Wrong medical content is worse than none |
 | 2026-11-19 | No HUMC policy content | Policies are internal and vary; app is a study aid |
+| 2026-11-19 | Phase 1 widened to a full working trainer for 5 rhythms | Owner asked for something usable now; he's retaking the exam and struggles with test anxiety |
+| 2026-11-19 | Explanations computed from the strip's own measurements | Feedback matches what's on screen; tests prove the answer key and every "why not" agree with the strip |
+| 2026-11-19 | Gaussian beat model (after ECGSYN), own code | Established published approach, no GPL code copied, every parameter tied to a criterion |
+| 2026-11-19 | Generated rates keep a margin from cutoffs | No unfair borderline strips while the set is small |
+| 2026-11-19 | Exam: hide-able countdown, calm tips, misses go to review | Test anxiety: practice the clock, then turn every miss into practice |
