@@ -13,6 +13,11 @@ Updated 2026-11-19. Read CLAUDE.md, then docs/plan.md, then this.
   Mastery/Trends/Exams. Details, verification and gaps: `docs/phases/4-adaptive-learning.md`.
 - Owner hasn't checked step 3 on the real iPhone yet.
 
+## Step 5 (campus) in progress
+- Research and ambiguity log written: `docs/phases/5-campus-research.md`. Blockout waits on
+  Three.js approval, OSM footprints (OpenStreetMap unreachable from this environment) and
+  the nurse's answers on "the Pavilion" and St. John height.
+
 ## Next
 - Owner chose: **step 5, campus research and blockout** (`docs/future/3d-campus.md`,
   prompt in docs/prompts.md). Video comes after the campus so it's made once with real
