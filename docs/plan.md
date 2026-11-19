@@ -30,6 +30,7 @@ his coworkers. Details in `docs/research.md`.
 | 5 | Stepdown "what now" | Strip + vitals + one line of context, then stable vs unstable and next action; every answer sourced, reviewed by the nurse | |
 | 6 | Post-op heart surgery | Epicardial pacing modes (AAI, VVI, DDD), failure to capture / sense, oversensing, post-op AFib | |
 | 7 | Polish + share | Icon (ChatGPT prompt in spec), name, GitHub Pages link, feedback round with the nurse | |
+| 8 | 3D campus (future) | Interactive 3D HUMC campus that lights up with mastery. Spec only: `docs/future/3d-campus.md` | not scheduled |
 
 v1 = phases 1 to 4. He tests after phase 2.
 

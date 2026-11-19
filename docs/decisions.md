@@ -16,3 +16,5 @@
 | 2026-11-19 | Gaussian beat model (after ECGSYN), own code | Established published approach, no GPL code copied, every parameter tied to a criterion |
 | 2026-11-19 | Generated rates keep a margin from cutoffs | No unfair borderline strips while the set is small |
 | 2026-11-19 | Exam: hide-able countdown, calm tips, misses go to review | Test anxiety: practice the clock, then turn every miss into practice |
+| 2026-11-19 | 3D campus documented, not built; clinical phases first | Exam prep is the urgent need; 3D adds a dependency and needs verified references first |
+| 2026-11-19 | Future 3D engine: vendored Three.js, not React Three Fiber; Remotion only for rendered cutscenes | Keeps the no-build architecture; Remotion renders frame-driven video, not interactive scenes |
