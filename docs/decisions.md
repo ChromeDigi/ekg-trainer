@@ -18,3 +18,9 @@
 | 2026-11-19 | Exam: hide-able countdown, calm tips, misses go to review | Test anxiety: practice the clock, then turn every miss into practice |
 | 2026-11-19 | 3D campus documented, not built; clinical phases first | Exam prep is the urgent need; 3D adds a dependency and needs verified references first |
 | 2026-11-19 | Future 3D engine: vendored Three.js, not React Three Fiber; Remotion only for rendered cutscenes | Keeps the no-build architecture; Remotion renders frame-driven video, not interactive scenes |
+| 2026-11-19 | Campus priorities corrected: main hospital with St. John (old, ~6 stories, part of the connected complex), the existing Pavilion, Helena Theurer Pavilion, Medical Plaza, research tower, Women's and Children's, JTCC last | Owner knowledge plus the official 2024 campus map; recognizability by staff is the bar |
+| 2026-11-19 | Fountain is decoration in a real location, not a reward; mastery shows through building light and detail, never extra floors | Keep the campus truthful at every stage |
+| 2026-11-19 | Spaced repetition: FSRS (default parameters), not SM-2 | Recall probability per skill powers "likely to forget" sessions and honest mastery for the campus |
+| 2026-11-19 | Photo import is optional, on-device, opt-in for any external AI | Privacy promise; patient data must never enter the app |
+| 2026-11-19 | Cinematic intro and iPhone walkthrough are separate; both made only from finished features | No advertising features that don't exist |
+| 2026-11-19 | The nurse's name stays out of the repo | Public repo; CLAUDE.md bans staff names |

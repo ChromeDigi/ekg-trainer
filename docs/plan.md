@@ -18,21 +18,36 @@ his coworkers. Details in `docs/research.md`.
 - No drug dosing calculators.
 - No CE credit or certification.
 
-## Phases
+## Long-term goal
+A serious ECG learning app with scientifically grounded mastery tracking, a faithful 3D
+miniature of the real HUMC campus that lights up with demonstrated mastery, and a
+cinematic intro. Worth using regularly, not a tech demo. The core trainer stays fast,
+offline and usable without any of the heavy modules.
 
-| # | Phase | What ships | Status |
+## Delivery sequence (owner, 2026-11-19)
+
+| # | Step | Spec | Status |
 |---|---|---|---|
-| 0 | Foundation | CLAUDE.md, plan, spec, research, decisions, sources | done |
-| 1 | Core trainer (5 rhythms) | Strip engine, Learn, untimed Practice with measured explanations, Missed review, timed Exam, Progress, calipers, offline. Widened on owner request; see `docs/phases/1-core-trainer.md` | done |
-| 2 | Full rhythm set | Rest of the basic set below, lookalike pairs (SVT vs sinus tach, flutter vs AFib), borderline strips, nurse feedback round | next |
-| 3 | Exam realism | Exam formats once the HUMC test is known (fill-in vs multiple choice, interval questions), optional 5-choice mode | |
-| 4 | Weak spots + | Short daily set, streaks, speed targets per rhythm | |
-| 5 | Stepdown "what now" | Strip + vitals + one line of context, then stable vs unstable and next action; every answer sourced, reviewed by the nurse | |
-| 6 | Post-op heart surgery | Epicardial pacing modes (AAI, VVI, DDD), failure to capture / sense, oversensing, post-op AFib | |
-| 7 | Polish + share | Icon (ChatGPT prompt in spec), name, GitHub Pages link, feedback round with the nurse | |
-| 8 | 3D campus (future) | Interactive 3D HUMC campus that lights up with mastery. Spec only: `docs/future/3d-campus.md` | not scheduled |
+| 0 | Foundation docs | this folder | done |
+| 1 | Core trainer, 5 rhythms | `docs/phases/1-core-trainer.md` | done |
+| 1b | GitHub Pages deploy + verify | live at https://chromedigi.github.io/ekg-trainer/ | done (browser); real iPhone test with owner pending |
+| 2 | Difficult rhythms: clinically accurate advanced rhythms, meaningful lookalikes, borderline strips, stronger exam prep | `docs/phases/2-*.md` (write first) | next |
+| 3 | Adaptive learning: FSRS spaced repetition, mastery, contrast and boundary practice, practice vs exam tracking | `docs/future/adaptive-learning.md` | |
+| 4 | Photo import (optional): educational images, on-device, privacy-first | `docs/future/photo-import.md` | when rules can be met |
+| 5 | Campus research and blockout: reference boards, ambiguity log, accurate massing | `docs/future/3d-campus.md` | |
+| 6 | Campus mastery visualization: detailed models, lighting, mastery-driven illumination | `docs/future/3d-campus.md` | |
+| 7 | Cinematic intro video from real, finished features | `docs/future/cinematic-intro.md` | |
+| 8 | iPhone install and usage walkthrough | `docs/future/iphone-onboarding.md` | |
+| 9 | Final QA: accessibility, iPhone performance, clinical-content verification | | |
 
-v1 = phases 1 to 4. He tests after phase 2.
+Clinical side-tracks to fit in after step 3, once the core is solid:
+stepdown "what now" scenarios (strip + vitals, stable vs unstable, sourced, nurse-reviewed)
+and post-op heart surgery strips (epicardial pacing modes, failure to capture or sense,
+post-op AFib). App icon from the ChatGPT prompt in `docs/spec.md` any time.
+
+Rules for the roadmap: don't rebuild or replace the working trainer; heavy modules (3D,
+video) load separately and only when opened; any new dependency gets an owner decision
+first (logged in `docs/decisions.md`).
 
 ## Basic rhythm set (phase 2, final list checked against sources)
 Sinus: normal sinus, sinus brady, sinus tach, sinus arrhythmia, sinus pause/arrest.
@@ -45,6 +60,7 @@ Paced: atrial paced, ventricular paced, AV paced, failure to capture, failure to
 Lethal set for the exam rule: VT, VF, asystole, torsades.
 
 ## Open questions for the nurse
-- Which exam does HUMC use (Relias or internal), and the pass mark?
+- Which exam does HUMC use (Relias, HealthStream, internal), format and pass mark?
 - What does the CTICU quiz him on most?
-- After phase 2: what's missing, what's wrong, what's annoying.
+- After real-iPhone testing and phase 2: what's missing, wrong or annoying.
+- Campus: is "the Pavilion" Schlesinger Pavilion? St. John height? Real fountain?

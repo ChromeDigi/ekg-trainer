@@ -1,36 +1,48 @@
 # Build prompts
 
-Paste one to start a phase. Each assumes Claude reads CLAUDE.md and docs first.
+Paste one to start a step. Each assumes Claude reads CLAUDE.md, docs/plan.md and the
+step's spec first. Order follows the delivery sequence in docs/plan.md.
 
-## Phase 1: Strip engine
-"Start phase 1 of docs/plan.md. Write docs/phases/1-strip-engine.md first. Build the
-waveform generator and canvas strip from docs/spec.md: 6-second lead II, real scale grid,
-live sweep, 5 starter rhythms (normal sinus, sinus brady, sinus tach, atrial fib, VT),
-and a simple browse screen. Add sources for those 5 to docs/sources.md. Run it at
-360 px wide and show me screenshots."
+## Step 2: Difficult rhythms
+"Start step 2 of docs/plan.md. Write docs/phases/2-difficult-rhythms.md first. Keep the
+phase 1 architecture. Add clinically accurate harder rhythms with sources read directly
+(LITFL, StatPearls, AHA): heart blocks (1st, 2nd type I and II, 3rd), atrial flutter, SVT,
+junctional rhythms, PACs, PVCs and patterns, VF, asystole, torsades. Meaningful lookalike
+distractors, borderline strips near cutoffs, stronger exam prep. Generator tests for every
+rhythm, everything tagged pending nurse review. Include fixes from the owner's iPhone test.
+Screenshot at phone width, verify the live site after push."
 
-## Phase 2: Full rhythm set
-"Start phase 2. Phase doc first. Add the rest of the basic rhythm set in docs/plan.md,
-lookalikes first (SVT, atrial flutter, junctional, PVCs, heart blocks, VF, asystole,
-torsades), each with sources in docs/sources.md, generator tests, and the nurse's feedback
-from phase 1. Screenshot at phone width."
+## Step 3: Adaptive learning
+"Start step 3. Read docs/future/adaptive-learning.md, write the phase doc. Implement FSRS
+with default parameters in vanilla JS, ekg.progress.v2 with migration from v1, mastery
+per rhythm and category, contrast and boundary sessions, practice vs exam tracking, and
+the Today / Mastery / Trends screens. Tests for scheduling and migration."
 
-## Phase 3: Exam mode
-"Start phase 3. Phase doc first. Timed exam with a set count, selectable pass mark
-(80/85/90%), 100% lethal rule, and review of misses."
+## Step 4: Photo import (optional)
+"Start step 4 only if the owner confirms. Read docs/future/photo-import.md. On-device
+only: pick or take a photo, crop/rotate/enhance, private IndexedDB collection, identifier
+warning, caliper-based comparison with criteria. No external AI."
 
-## Phase 4: Weak spots
-"Start phase 4. Phase doc first. Track results per rhythm in ekg.progress.v1, bring
-missed rhythms back more often, add a short daily set and a Progress screen."
+## Step 5: Campus research and blockout
+"Start step 5. Read docs/future/3d-campus.md. Build reference boards and the ambiguity log
+(no copyrighted images committed), confirm open questions with the owner, then a Three.js
+blockout of priorities 1A to 1C as a separate, lazily loaded module. Owner approves the
+Three.js dependency first."
 
-## Phase 5: Stepdown "what now"
-"Start phase 5. Phase doc first. Scenarios: strip + vitals + one line of context, then
-stable vs unstable and next action. Every answer sourced and tagged review pending."
+## Step 6: Campus mastery visualization
+"Start step 6. Detailed models in priority order, day / golden hour / night lighting,
+real-location fountain if verified, mastery-driven illumination from step 3 data, iPhone
+performance budget."
 
-## Phase 6: Post-op heart surgery
-"Start phase 6. Phase doc first. Epicardial pacing modes, failure to capture / sense,
-oversensing, post-op AFib. Sourced, review pending."
+## Step 7: Cinematic intro
+"Start step 7. Read docs/future/cinematic-intro.md. Storyboard, Playwright captures of real
+features, Remotion edit with the campus flyover, sound with mute, in-app first-launch
+behavior and a standalone export."
 
-## Phase 7: Polish + share
-"Start phase 7. Phase doc first. Icon from the ChatGPT prompt, final name, GitHub Pages,
-and a feedback checklist for the nurse."
+## Step 8: iPhone walkthrough
+"Start step 8. Read docs/future/iphone-onboarding.md. Real captures on current iOS,
+swipeable cards, replay from About."
+
+## Step 9: Final QA
+"Start step 9. Accessibility review, iPhone performance, clinical-content verification
+with the nurse's review recorded, docs and decisions brought up to date."
