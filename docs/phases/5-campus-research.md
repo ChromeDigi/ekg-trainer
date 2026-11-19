@@ -94,16 +94,31 @@ schematic with north up; it shows positions and adjacency, not exact sizes.
 | A4 | Is there a fountain, and where? | Map shows an oval island in the main entrance loop off Prospect Ave; nothing says it is a fountain | Nurse or a street-level photo | No fountain |
 | A5 | Medical Plaza: 20 Prospect Ave, 9 stories? | Height from secondary source only; address not found | HMH page or nurse | Map position only, height marked secondary |
 | A6 | Jurist Research Center = research tower at 40 Prospect? | Map position fits; address not found | HMH page or nurse | Map position only |
-| A7 | Exact footprints and heights | OSM blocked from this environment (see below); map is schematic | OSM via another network, or USGS lidar | Footprints traced from map proportions are NOT used; blockout waits for OSM |
-| A8 | Heights for the other sections (Strawbridge, Main, Conklin, Schlesinger) | Nothing found | Lidar or photos | Not modeled in detail |
+| A7 | Footprints for 1A to 1C | OSM lumps the main hospital into one 2017 polygon and lacks Helena Theurer Pavilion | Aerial imagery (public NJ or USGS orthophotos), owner photos | Not modeled until traced from imagery |
+| A8 | Heights for every section except Helena Theurer (9) | Nothing found; OSM has no heights | Lidar or photos | Not modeled in detail |
 
 ## Data access (2026-11-19)
 - `www.hackensackmeridianhealth.org` reachable (map and pages read).
-- OpenStreetMap: `overpass-api.de` was added to the environment's allowed hosts, but
-  every request is cut after the first 39 bytes (connection reset). `api.openstreetmap.org`,
-  `nominatim.openstreetmap.org` and `overpass.kumi.systems` are blocked by the network
-  policy. Without OSM there are no measured footprints yet.
-- USGS 3DEP lidar: not tried yet.
+- OpenStreetMap: `api.openstreetmap.org` works (owner allowed it); `overpass-api.de` and
+  `overpass.kumi.systems` cut or time out. Data pulled for the campus area on 2026-11-19.
+
+## What OpenStreetMap has (and doesn't)
+- **No heights or floor counts** on any campus building (`height` / `building:levels`
+  absent everywhere).
+- Streets match the official map: Prospect Ave, Atlantic St, 2nd Street, Essex St.
+- Usable, recently edited footprints: Medical Plaza ("Hackensack University Medical
+  Plaza", edited 2022), Women's and Children's Pavilion (2024), Don Imus/WFAN Pediatric
+  Center (2023), Employee Parking Garage across 2nd St (2023, likely the map's "Helena
+  Theurer Pavilion Parking"), Jurist Research Center, John Theurer Cancer Center,
+  Hillcrest Building, Visitors Parking (= map's Main Parking Garage).
+- **Stale where it matters most.** The east half of the main hospital is one polygon
+  named "Patient Pavilion", last edited 2017-12-02. It lumps St. John, Strawbridge, Main,
+  Conklin and Schlesinger into one shape with no internal splits. "George Link Jr.
+  Pavilion" (2017) sits west of it, by the main entrance.
+- **Helena Theurer Pavilion is missing.** It opened in 2023; the strip between the
+  "Patient Pavilion" polygon and 2nd Street is empty in OSM.
+- No fountain is mapped anywhere on campus.
+- So OSM gives priority 2 to 4 footprints and the streets, but not 1A to 1C.
 
 ## Plan once unblocked
 1. Pull OSM footprints, `height` and `building:levels` tags for the block bounded by
@@ -117,5 +132,6 @@ schematic with north up; it shows positions and adjacency, not exact sizes.
 ## Status
 - Research and ambiguity log: done for what public, allowed sources give.
 - Three.js approved; 1B = Schlesinger Pavilion (owner, 2026-11-19).
-- Blockout: not started. Waiting on OSM footprints; St. John height (A2) stays an
-  estimate until the nurse confirms.
+- OSM pulled: good for streets and priorities 2 to 4, stale for 1A to 1C (see above).
+- Blockout: not started. Needs footprints for 1A to 1C from aerial imagery and heights
+  (lidar or nurse/photos).
