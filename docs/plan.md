@@ -32,8 +32,8 @@ offline and usable without any of the heavy modules.
 | 1 | Core trainer, 5 rhythms | `docs/phases/1-core-trainer.md` | done |
 | 1b | GitHub Pages deploy + verify | live at https://chromedigi.github.io/ekg-trainer/ | done; owner tested on a real iPhone, nothing to fix |
 | 2 | Difficult rhythms: clinically accurate advanced rhythms, meaningful lookalikes, borderline strips, stronger exam prep | `docs/phases/2-difficult-rhythms.md` | done and live; nurse review pending |
-| 2b | Premium UI: app icon, icon system, design language, home dashboard, first-launch onboarding (replaces old step 8) | `docs/phases/3-premium-ui.md` | built on branch `step-2b-premium-ui`, verified in Chromium; waiting for owner push and iPhone check |
-| 3 | Adaptive learning: FSRS spaced repetition, mastery, contrast and boundary practice, practice vs exam tracking | `docs/future/adaptive-learning.md` | |
+| 2b | Premium UI: app icon, icon system, design language, home dashboard, first-launch onboarding (replaces old step 8) | `docs/phases/3-premium-ui.md` | done and live; owner checked it on a real iPhone: "looks perfect" |
+| 3 | Adaptive learning: FSRS spaced repetition, mastery, contrast and boundary practice, practice vs exam tracking | `docs/phases/4-adaptive-learning.md` | built on branch `step-3-adaptive-learning`, verified in Chromium; waiting for owner push and iPhone check |
 | 4 | Photo import (optional): educational images, on-device, privacy-first | `docs/future/photo-import.md` | when rules can be met |
 | 5 | Campus research and blockout: reference boards, ambiguity log, accurate massing | `docs/future/3d-campus.md` | |
 | 6 | Campus mastery visualization: detailed models, lighting, mastery-driven illumination | `docs/future/3d-campus.md` | |

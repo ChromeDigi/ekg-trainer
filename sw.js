@@ -1,9 +1,9 @@
 /* Offline support: serve from cache, refresh the cache in the background.
    Bump VERSION whenever app files change so phones pick up the update. */
-const VERSION = "ekg-v3";
+const VERSION = "ekg-v4";
 const FILES = [
   "./", "index.html", "styles.css", "manifest.webmanifest",
-  "js/rhythms.js", "js/ecg.js", "js/quiz.js", "js/strip.js", "js/progress.js", "js/theme.js", "js/tour.js", "js/app.js",
+  "js/rhythms.js", "js/ecg.js", "js/quiz.js", "js/strip.js", "js/fsrs.js", "js/progress.js", "js/theme.js", "js/tour.js", "js/app.js",
   "icons/icon.svg", "icons/favicon.svg", "icons/favicon-32.png", "icons/apple-touch-icon.png",
   "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png",
   "img/tour/home.webp", "img/tour/learn.webp", "img/tour/practice.webp", "img/tour/exam.webp", "img/tour/progress.webp"

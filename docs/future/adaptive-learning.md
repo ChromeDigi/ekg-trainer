@@ -1,6 +1,6 @@
 # Future module: adaptive learning and mastery
 
-Status: **documented, next after phase 2.** Extends the phase 1 missed-rhythm system
+Status: **built in step 3** (see `docs/phases/4-adaptive-learning.md` for what shipped and what changed). Extends the phase 1 missed-rhythm system
 (`js/progress.js`, `ekg.progress.v1`). Must be real learning data: the 3D campus reads it.
 
 ## Requirements (owner, 2026-11-19)

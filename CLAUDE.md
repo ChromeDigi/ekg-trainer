@@ -29,7 +29,8 @@ Plain HTML, CSS and JavaScript. No framework, no dependencies, no build step, no
   random variation, so every strip is new. Samples in mV against time.
 - `js/strip.js`: draws strips on `<canvas>` (grid, trace, live sweep, calipers).
 - `js/drill.js`, `js/exam.js`, `js/scenarios.js`: practice modes.
-- `js/progress.js`: scores, missed rhythms, spaced repetition.
+- `js/fsrs.js`: FSRS-6 scheduler (port of py-fsrs, checked against its numbers).
+- `js/progress.js`: answers, FSRS items, mastery, trends (`ekg.progress.v2`).
 - `js/tour.js`: first-launch intro (real screenshots in `img/tour/`).
 - `sw.js` + `manifest.webmanifest` + `icons/`: offline + Add to Home Screen.
 - `tools/`: dev-only Playwright scripts (icons, intro screenshots). Never loaded by the app.
@@ -58,7 +59,7 @@ Plain HTML, CSS and JavaScript. No framework, no dependencies, no build step, no
 ## Data
 
 - Everything lives in the browser's `localStorage`. Keys are versioned:
-  `ekg.progress.v1`, `ekg.prefs.v1`. If a shape changes, bump the version and migrate,
+  `ekg.progress.v2` (migrated from v1), `ekg.prefs.v1`. If a shape changes, bump the version and migrate,
   so progress is never lost.
 - No accounts, no names, no patient information, ever. Nothing leaves the phone.
 

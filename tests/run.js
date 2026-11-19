@@ -5,6 +5,7 @@ const assert = require("assert");
 require("../js/rhythms.js");
 require("../js/ecg.js");
 require("../js/quiz.js");
+require("../js/fsrs.js");
 const { rhythms, ecg, quiz } = globalThis.EKG;
 
 const N = Number(process.env.N || 800);
@@ -244,9 +245,109 @@ ok(quiz.boxes(0.10) === "2.5" && quiz.boxes(0.2) === "5", "small boxes shown wit
   ok(JSON.stringify(pg.recentMisses(5)) === JSON.stringify(["nsr", "vt", "afib"]), "recent misses: distinct, newest first");
   for (let i = 0; i < 30; i++) pg.record("vt", true, 700, "practice");
   ok(pg.accuracy(["vt"]).pct === 100 && pg.accuracy(["vt"], 20).n === 20, "accuracy uses the last 20 answers");
-  ok(JSON.parse(store["ekg.progress.v1"]).answers.length === 35, "answers saved to ekg.progress.v1");
+  ok(JSON.parse(store["ekg.progress.v2"]).answers.length === 35, "answers saved to ekg.progress.v2");
   pg.reset();
   ok(pg.accuracy(["vt"]).pct === null && pg.recentMisses(5).length === 0, "reset clears dashboard data");
+}
+
+// ---------- Step 3: FSRS scheduler matches the reference py-fsrs 6.3.3 ----------
+{
+  const FS = globalThis.EKG.fsrs, V = require("./fsrs-vectors.json");
+  let steps = 0;
+  for (const seq of V.seqs) {
+    let c = FS.newCard();
+    for (const st of seq) {
+      c = FS.review(c, st.rating, st.at);
+      steps++;
+      ok(Math.abs(c.s - st.s) / st.s < 1e-9 && Math.abs(c.d - st.d) < 1e-9, "fsrs stability/difficulty match py-fsrs");
+      ok(c.state === st.state && c.step === st.step && c.due === st.due, "fsrs state, step and due match py-fsrs");
+      ok(Math.abs(FS.retrievability(c, st.at + 5 * 864e5) - st.r) < 1e-9, "fsrs recall probability matches py-fsrs");
+    }
+  }
+  ok(steps > 300, "fsrs vectors cover " + steps + " reviews");
+  ok(FS.retrievability(FS.newCard(), Date.now()) === 0, "unseen card has recall 0");
+}
+
+// ---------- Step 3: progress v2, migration, grading, mastery, sessions ----------
+function freshProgress(store) {
+  globalThis.localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); } };
+  delete require.cache[require.resolve("../js/progress.js")];
+  require("../js/progress.js");
+  return globalThis.EKG.progress;
+}
+{
+  const D = 864e5, M = 60e3, T0 = Date.UTC(2026, 0, 5, 21, 0);
+  // Migration: v1 answers replay into v2 in time order; v1 stays untouched.
+  const v1 = { answers: [
+    { r: "vt", ok: true, ms: 3000, mode: "practice", at: T0 + 2 * M },
+    { r: "nsr", ok: true, ms: 2000, mode: "practice", at: T0 },
+    { r: "afib", ok: false, ms: 5000, mode: "exam", at: T0 + M },
+    { r: "vt", ok: true, ms: 2500, mode: "practice", at: T0 + 20 * M }
+  ], sessions: [{ mode: "exam", total: 1, correct: 0, pct: 0, passed: false, at: T0 + M }], review: { afib: 2 } };
+  const store = { "ekg.progress.v1": JSON.stringify(v1) };
+  const before = store["ekg.progress.v1"];
+  let pg = freshProgress(store);
+  ok(store["ekg.progress.v1"] === before, "migration leaves ekg.progress.v1 untouched");
+  const v2 = JSON.parse(store["ekg.progress.v2"]);
+  ok(v2.v === 2 && v2.answers.length === 4 && v2.sessions.length === 1, "v1 answers and sessions carried into v2");
+  ok(v2.answers[0].r === "nsr" && v2.answers[3].at === T0 + 20 * M, "replay in time order");
+  ok(pg.migrated() === 4, "migration count reported");
+  ok(pg.item("r:vt").reps === 2 && pg.item("r:vt").state === globalThis.EKG.fsrs.REVIEW, "VT: two Goods finish the learning steps");
+  ok(pg.item("r:afib").lapses === 1 && pg.item("r:afib").due === T0 + M + 1 * M, "AFib miss: due again in 1 minute");
+  ok(pg.accuracy(["nsr", "vt", "afib"]).pct === 75, "accuracy unchanged by migration");
+  // A second load reads v2 and does not replay again.
+  store["ekg.progress.v1"] = JSON.stringify({ answers: [] });
+  pg = freshProgress(store);
+  ok(pg.accuracy(["vt"]).n === 2, "v2 loads on its own once written");
+
+  // Grading from the learner's own speed.
+  const G = globalThis.EKG.fsrs;
+  ok(pg.grade(false, 100, [1, 2, 3, 4, 5]) === G.AGAIN, "wrong = Again");
+  ok(pg.grade(true, 9000, [1000, 2000, 3000]) === G.GOOD, "under 5 earlier times = Good");
+  const t = [2000, 3000, 4000, 5000, 6000];
+  ok(pg.grade(true, 5500, t) === G.HARD && pg.grade(true, 2500, t) === G.EASY && pg.grade(true, 4000, t) === G.GOOD, "Hard/Easy from own 75th/25th percentile");
+
+  // Due, contrast pairs, boundary items.
+  pg = freshProgress({});
+  pg.record("flutter", false, 4000, "practice", { pick: "afib", shown: ["flutter", "afib", "svt", "tach"], at: T0 });
+  ok(pg.item("c:afib|flutter") && pg.item("c:afib|flutter").lapses === 1, "confusion creates a contrast item");
+  ok(pg.dueItems(T0).length === 0 && pg.dueItems(T0 + M).indexOf("r:flutter") >= 0, "missed rhythm due after 1 minute");
+  ok(pg.reviewIds(T0 + M).sort().join() === "afib,flutter", "due contrast pair brings both rhythms into review");
+  pg.record("afib", true, 3000, "practice", { pick: "afib", shown: ["afib", "flutter", "pac", "sarr"], at: T0 + 2 * M });
+  ok(pg.item("c:afib|flutter").reps === 2 && pg.item("c:afib|flutter").lapses === 1, "contrast item graded when both were choices");
+  pg.record("afib", true, 3000, "practice", { pick: "afib", shown: ["afib", "pac", "sarr", "svt"], at: T0 + 3 * M });
+  ok(pg.item("c:afib|flutter").reps === 2, "contrast item not graded when the pair wasn't shown");
+  pg.record("brady", true, 3000, "practice", { pick: "brady", shown: ["brady"], edge: "rate", at: T0 + 4 * M });
+  ok(pg.item("b:brady") && pg.item("r:brady"), "near-cutoff answer updates boundary and rhythm items");
+  ok(JSON.parse(JSON.stringify(pg.pairs(T0 + 60 * M)))[0].id === "c:afib|flutter", "pairs list");
+  const w = pg.weights(["nsr", "flutter", "brady"], T0 + 60 * M);
+  ok(w.nsr === 7 && w.flutter > w.brady, "weights: new highest, missed above known");
+  ok(pg.weakest(["nsr", "flutter", "brady", "afib"], 3, T0 + 60 * M)[0] === "flutter", "weakest: the missed rhythm first");
+
+  // Mastery: correct over weeks earns it; one lucky day doesn't; a miss takes it away.
+  pg = freshProgress({});
+  let at = T0;
+  for (let i = 0; i < 3; i++) { pg.record("vt", true, 3000, "practice", { at: at }); at += 10 * M; }
+  ok(!pg.mastery(["vt"], at)[0].mastered, "one good day is not mastery");
+  for (const gap of [3, 9, 25, 60]) { at += gap * D; pg.record("vt", true, 3000, "practice", { at: at }); }
+  const mv = pg.mastery(["vt"], at)[0];
+  ok(mv.mastered && mv.s >= 21 && mv.days >= 3 && mv.r >= 0.9, "repeated recall over weeks = mastered (s " + mv.s.toFixed(1) + " days)");
+  ok(!pg.mastery(["vt"], at + 400 * D)[0].mastered, "mastery fades if not reviewed (recall drops under 0.90)");
+  ok(pg.groupMastery(["vt", "vf"], at).mastered === 1 && pg.groupMastery(["vt", "vf"], at).score > 0.45, "group mastery weighted by recall");
+  pg.record("vt", false, 3000, "practice", { at: at + D });
+  ok(!pg.mastery(["vt"], at + D)[0].mastered, "a miss in the last 5 removes mastery");
+  ok(pg.likelyToForget(["vt"], 5, at + D).length === 0, "relearning rhythm is not in 'likely to forget'");
+
+  // Trends: practice and exam apart, mastered count per week.
+  pg = freshProgress({});
+  at = T0;
+  for (let i = 0; i < 3; i++) { pg.record("vt", true, 3000, "practice", { at: at }); at += 10 * M; }
+  for (const gap of [3, 9, 25, 60]) { at += gap * D; pg.record("vt", true, 3000, "practice", { at: at }); }
+  pg.record("nsr", false, 9000, "exam", { at: at + M });
+  const tr = pg.trends(["vt", "nsr"], 16, at + 2 * M);
+  const lastW = tr[tr.length - 1];
+  ok(tr.length === 16 && lastW.exam.n === 1 && lastW.exam.pct === 0 && lastW.practice.n === 1 && lastW.practice.pct === 100, "trends split practice and exam");
+  ok(lastW.mastered === 1 && tr[0].mastered === 0 && tr.some((x) => x.mastered === 0 && x.practice.n > 0), "trends count mastered rhythms at each week end");
 }
 
 console.log("all", checks, "checks passed");

@@ -206,23 +206,85 @@
   // ---------- Home dashboard ----------
   // Honest numbers only: accuracy from real answers; untried groups read "not tried yet".
   function groupIds(gid) { return rhythms.list.filter(function (R) { return R.group === gid; }).map(function (R) { return R.id; }); }
-  function goPractice(mode) { pr.mode = mode; pr.last = null; pr.strip = null; show("practice"); }
+  function goPractice(mode) {
+    if (mode === "review") { startSession("due"); return; }
+    pr.session = null; pr.mode = mode; pr.last = null; pr.strip = null; show("practice");
+  }
+
+  // ---------- adaptive sessions (step 3) ----------
+  // Each session is 10 strips chosen by the scheduler; free practice stays as it was.
+  const SESSION_LEN = 10;
+  const EDGE_IDS = rhythms.list.filter(function (R) { return R.gen && R.gen.edge; }).map(function (R) { return R.id; });
+  function rel(ms) {
+    if (ms <= 0) return "now";
+    const m = Math.max(1, Math.round(ms / 60e3));
+    if (m < 60) return "in " + m + " min";
+    const hr = Math.round(m / 60);
+    if (hr < 24) return "in " + hr + " h";
+    const d = Math.round(hr / 24);
+    return d === 1 ? "tomorrow" : "in " + d + " days";
+  }
+  function pickFrom(ids) { return { id: quiz.pickRhythm(progress.weights(ids), Math.random, pr.last) }; }
+  function fromItem(itemId) {
+    const parts = itemId.slice(2).split("|");
+    if (itemId[0] === "b") return { id: parts[0], edge: true };
+    if (itemId[0] === "c") { const i = Math.random() < 0.5 ? 0 : 1; return { id: parts[i], must: [parts[1 - i]] }; }
+    return { id: parts[0] };
+  }
+  function sessionDef(kind, opt) {
+    opt = opt || {};
+    if (kind === "due") return { title: "5-minute review", pick: function () {
+      const due = progress.dueItems();
+      const it = due.find(function (x) { return x.slice(2).split("|").indexOf(pr.last) < 0; }) || due[0];
+      return it ? fromItem(it) : pickFrom(ALL);
+    } };
+    if (kind === "weakest") {
+      const ids = progress.weakest(ALL, 3);
+      return { title: "Weakest rhythms", ids: ids, empty: "No weak spots yet. Rhythms you miss or answer slowly show up here.", pick: function () { return pickFrom(ids); } };
+    }
+    if (kind === "forget") {
+      const ids = progress.likelyToForget(ALL, 5);
+      return { title: "Likely to forget", ids: ids, empty: "Nothing in long-term review yet. A rhythm gets there after you get it right a few times, minutes apart.", pick: function () { return pickFrom(ids); } };
+    }
+    if (kind === "pairs") {
+      const ps = progress.pairs().slice(0, 3);
+      return { title: "Confused pairs", ids: ps.map(function (p) { return p.a; }), empty: "No confused pairs yet. When you pick one rhythm for another, that pair shows up here for head-to-head practice.",
+        pick: function () { const p = ps[Math.random() < 0.6 ? 0 : Math.floor(Math.random() * ps.length)]; return fromItem(p.id); } };
+    }
+    if (kind === "edge") return { title: "Near the cutoffs", ids: EDGE_IDS, pick: function () {
+      const now = Date.now(), w = {};
+      EDGE_IDS.forEach(function (id) {
+        const it = progress.item("b:" + id);
+        w[id] = !it ? 5 : 1 + 4 * (1 - progress.recall("b:" + id, now)) + (it.due <= now ? 4 : 0);
+      });
+      return { id: quiz.pickRhythm(w, Math.random, pr.last), edge: true };
+    } };
+    if (kind === "errors") return { title: "Errors from your exam", ids: opt.ids || [], empty: "That exam had no errors.", pick: function () { return pickFrom(opt.ids); } };
+    return null;
+  }
+  function startSession(kind, opt) {
+    const d = sessionDef(kind, opt);
+    pr.session = Object.assign({ kind: kind, opt: opt, n: 0, ok: 0 }, d);
+    pr.last = null; pr.strip = null;
+    if (current === "practice") nextPractice(); else show("practice");
+  }
+
   function recommend() {
-    const rev = progress.reviewIds();
-    if (rev.length) return { ic: "i-review", tone: "red", title: "Review " + rev.length + " missed rhythm" + (rev.length > 1 ? "s" : ""),
-      why: "Misses stay in review until you get them right twice in a row.", go: function () { goPractice("review"); } };
+    const due = progress.dueItems();
+    if (due.length) return { ic: "i-review", tone: "red", title: "Review " + due.length + " due now",
+      why: "Missed rhythms come back within minutes; ones you know come back at growing gaps.", go: function () { startSession("due"); } };
     const gs = rhythms.groups.map(function (g) { return { g: g, a: progress.accuracy(groupIds(g.id)) }; });
     const untried = gs.find(function (x) { return x.a.attempts === 0; });
     if (untried) return { ic: "i-" + untried.g.id, title: "Try " + untried.g.name + " rhythms",
       why: "You haven't answered any " + untried.g.name.toLowerCase() + " strips yet.", go: function () { goPractice(untried.g.id); } };
-    const thin = gs.filter(function (x) { return x.a.n < 5; }).sort(function (a, b) { return a.a.n - b.a.n; })[0];
-    if (thin) return { ic: "i-" + thin.g.id, title: "More " + thin.g.name + " practice",
-      why: "Only " + thin.a.n + " answer" + (thin.a.n === 1 ? "" : "s") + " so far, too few to judge.", go: function () { goPractice(thin.g.id); } };
-    const weak = gs.slice().sort(function (a, b) { return a.a.pct - b.a.pct; })[0];
-    if (weak.a.pct < 90) return { ic: "i-" + weak.g.id, tone: "amber", title: "Practice " + weak.g.name,
-      why: "Your lowest group: " + weak.a.pct + "% over your last " + weak.a.n + " answers.", go: function () { goPractice(weak.g.id); } };
+    const p = progress.pairs()[0];
+    if (p && p.due) return { ic: "i-review", tone: "amber", title: "Compare " + rhythms.byId[p.a].short + " and " + rhythms.byId[p.b].short,
+      why: "You've mixed these two up. Head-to-head strips teach the difference.", go: function () { startSession("pairs"); } };
+    const weak = progress.weakest(ALL, 3);
+    if (weak.length) return { ic: "i-practice", tone: "amber", title: "Practice your weakest",
+      why: weak.map(function (id) { return rhythms.byId[id].short; }).join(", ") + ": recent misses or low recall.", go: function () { startSession("weakest"); } };
     return { ic: "i-timer", tone: "blue", title: "Take a timed exam",
-      why: "Every group is at 90% or better in your recent answers. Test it under the clock.", go: function () { show("exam"); } };
+      why: "Nothing is due and nothing stands out as weak. Test it under the clock.", go: function () { show("exam"); } };
   }
   function ring(pct) {
     const r = 27, c = 2 * Math.PI * r;
@@ -262,17 +324,20 @@
       h("div", { class: "strip-wrap" }, mCanvas),
       h("span", { class: "lead", text: "II" }),
       h("div", { class: "hr", "aria-hidden": "true" }, h("span", { text: "HR" }), h("b", { text: String(Math.round(demo.measures.rate)) })));
-    const cont = pr.mode === "review" && !progress.reviewIds().length ? "all" : pr.mode;
-    const setName = cont === "review" ? "Missed rhythms" : (rhythms.sets.find(function (x) { return x.id === cont; }) || {}).name;
-    const cta = st.total
-      ? h("button", { type: "button", class: "btn primary block hero-cta", onclick: function () { goPractice(cont); } }, icon("i-play"), "Continue studying")
-      : h("button", { type: "button", class: "btn primary block hero-cta", onclick: function () { goPractice("core"); } }, icon("i-play"), "Start with Core 5");
+    const dueNow = progress.dueItems().length;
+    if (pr.mode === "review") pr.mode = "all";
+    const setName = (rhythms.sets.find(function (x) { return x.id === pr.mode; }) || {}).name;
+    const cta = !st.total
+      ? h("button", { type: "button", class: "btn primary block hero-cta", onclick: function () { goPractice("core"); } }, icon("i-play"), "Start with Core 5")
+      : dueNow
+        ? h("button", { type: "button", class: "btn primary block hero-cta", onclick: function () { startSession("due"); } }, icon("i-play"), "Review " + dueNow + " due now")
+        : h("button", { type: "button", class: "btn primary block hero-cta", onclick: function () { goPractice(pr.mode); } }, icon("i-play"), "Continue studying");
     v.append(h("div", { class: "card hero" }, monitor,
       h("div", { class: "hero-body" },
         h("div", null, h("div", { class: "eyebrow warm", text: greeting() }),
           h("h2", { text: st.total ? overall.pct + "% accuracy" : "Ready when you are" }),
           h("p", { class: "small muted", style: "margin:4px 0 0", text: st.total
-            ? "Your last " + overall.n + " answers · " + st.total + " strips in all · next: " + setName
+            ? "Your last " + overall.n + " answers · " + st.total + " strips in all" + (dueNow ? "" : " · next: " + setName)
             : "Five common rhythms first, then all 26. Every strip is new." })),
         cta)));
     requestAnimationFrame(function () {
@@ -281,7 +346,7 @@
       stopLive = function () { stop(); stopLive = null; };
     });
 
-    // Today's suggestion, with the reason shown.
+    // Suggested next, with the reason shown.
     const rc = recommend();
     v.append(h("div", { class: "stack", style: "gap:8px" }, h("div", { class: "eyebrow", text: "Suggested next" }),
       h("button", { type: "button", class: "card rec", onclick: rc.go },
@@ -289,17 +354,35 @@
         h("span", { class: "grow" }, h("strong", { text: rc.title }), h("p", { class: "why", text: rc.why })),
         icon("i-chevron", "chev"))));
 
-    // Recently missed rhythms: tap to open the rhythm's Learn card.
-    const missed = progress.recentMisses(5);
-    if (missed.length) {
+    // Today: what the scheduler has queued, the weakest rhythms, and short sessions.
+    if (st.total) {
+      const now = Date.now(), eod = new Date(); eod.setHours(23, 59, 59, 999);
+      const later = progress.dueItems(eod.getTime()).length - dueNow;
+      const fresh = ALL.filter(function (id) { return !progress.item("r:" + id); }).length;
+      const gm = progress.groupMastery(ALL, now);
+      const stat = function (n, label) { return h("div", { class: "tstat" }, h("b", { text: String(n) }), h("span", { text: label })); };
+      const weak = progress.weakest(ALL, 3, now);
+      const pairsN = progress.pairs(now).length;
+      const tileS = function (ic, tone, label, sub, go) {
+        return h("button", { type: "button", class: "tile-btn sess", onclick: go },
+          h("span", { class: "ic-chip" + (tone ? " " + tone : "") }, icon(ic)), h("span", { text: label }), h("span", { class: "sub", text: sub }));
+      };
       v.append(h("div", { class: "card stack" },
-        h("div", { class: "row-between" }, h("h3", { text: "Recently missed" }),
-          h("button", { type: "button", class: "btn small ghost", onclick: function () { goPractice("review"); }, hidden: !progress.reviewIds().length }, icon("i-review"), "Review")),
-        h("div", { class: "chips" }, missed.map(function (id) {
-          return h("button", { type: "button", class: "chip", "aria-label": "Open the Learn card for " + name(id), onclick: function () { openLearn(id); } },
-            rhythms.byId[id].lethal ? icon("i-lethal", "danger sm") : null, rhythms.byId[id].short);
-        })),
-        h("p", { class: "small muted", style: "margin:0", text: "Tap one to open its criteria." })));
+        h("div", { class: "row-between" }, h("h3", { text: "Today" }),
+          h("span", { class: "small muted", text: gm.mastered + " of " + ALL.length + " mastered" })),
+        h("div", { class: "tstats" }, stat(dueNow, "due now"), stat(later, "later today"), stat(fresh, "not tried")),
+        h("button", { type: "button", class: "btn block" + (dueNow ? " primary" : ""), onclick: function () { startSession("due"); } }, icon("i-timer"),
+          dueNow ? "Start a 5-minute review" : "5-minute practice"),
+        weak.length ? h("div", { class: "stack", style: "gap:6px" }, h("div", { class: "small muted", text: "Weakest right now (tap for criteria)" }),
+          h("div", { class: "chips" }, weak.map(function (id) {
+            return h("button", { type: "button", class: "chip", "aria-label": "Open the Learn card for " + name(id), onclick: function () { openLearn(id); } },
+              rhythms.byId[id].lethal ? icon("i-lethal", "danger sm") : null, rhythms.byId[id].short);
+          }))) : null,
+        h("div", { class: "shortcuts two" },
+          tileS("i-practice", "amber", "Weakest", weak.length ? weak.length + " rhythms" : "none yet", function () { startSession("weakest"); }),
+          tileS("i-review", "blue", "Likely to forget", progress.likelyToForget(ALL, 5, now).length + " in review", function () { startSession("forget"); }),
+          tileS("i-mastery", "red", "Confused pairs", pairsN ? pairsN + " pair" + (pairsN > 1 ? "s" : "") : "none yet", function () { startSession("pairs"); }),
+          tileS("i-measure", null, "Near the cutoffs", "rate, PR, QRS", function () { startSession("edge"); }))));
     }
 
     // Accuracy by group (rings). Unseen groups say "not tried yet", never 0%.
@@ -324,7 +407,7 @@
     const last = st.exams[0];
     if (last) v.append(h("p", { class: "small muted", style: "margin:0", text: "Last exam: " + last.pct + "% (" + (last.passed ? "pass" : "not yet") + "), " + new Date(last.at).toLocaleDateString() }));
     v.append(h("p", { class: "honest" }, icon("i-about"),
-      "Accuracy comes from your own answers on this phone. Mastery tracking (spaced repetition) isn't built yet, so nothing here claims mastery."));
+      "Accuracy comes from your own answers on this phone. Scheduling uses FSRS spaced repetition; mastery needs correct answers on 3 or more days and a memory that holds for weeks. The mastery rules are a draft until the nurse review."));
   }
   function openLearn(id) {
     show("learn");
@@ -411,15 +494,13 @@
   }
 
   // ---------- Practice ----------
-  const pr = { mode: "all", edge: false, strip: null, shown: [], at: 0, answered: false, n: 0, ok: 0, last: null, widget: null };
+  const pr = { mode: "all", edge: false, strip: null, shown: [], at: 0, answered: false, n: 0, ok: 0, last: null, widget: null, session: null };
   let practiceHeader = null;
   function renderPracticeHeader() {
     if (!practiceHeader) return;
-    const n = progress.reviewIds().length;
     const sc = practiceHeader.querySelector(".mono");
-    if (sc) sc.textContent = pr.n ? pr.ok + "/" + pr.n : "";
-    const opt = practiceHeader.querySelector("option[value=review]");
-    if (opt) opt.textContent = "Missed rhythms" + (n ? " (" + n + ")" : "");
+    const s = pr.session;
+    if (sc) sc.textContent = s ? Math.min(s.n + (pr.answered ? 0 : 1), SESSION_LEN) + " of " + SESSION_LEN : (pr.n ? pr.ok + "/" + pr.n : "");
   }
   function setIds(id) {
     const st = rhythms.sets.find(function (x) { return x.id === id; });
@@ -428,42 +509,63 @@
   function setPicker() {
     const sel = h("select", { class: "select", "aria-label": "Rhythm set", onchange: function () { pr.mode = sel.value; pr.last = null; nextPractice(); } });
     rhythms.sets.forEach(function (st) { sel.append(h("option", { value: st.id, text: st.name })); });
-    sel.append(h("option", { value: "review", text: "Missed rhythms" }));
+    if (pr.mode === "review") pr.mode = "all";
     sel.value = pr.mode;
     return sel;
+  }
+  function endSession() { pr.session = null; pr.last = null; nextPractice(); }
+  function sessionDone(v) {
+    const s = pr.session;
+    const upcoming = progress.dueItems(Infinity).map(function (id) { return progress.item(id).due; }).filter(function (t) { return t > Date.now(); })[0];
+    v.append(h("div", { class: "card stack done-card" },
+      h("div", { class: "row" }, h("span", { class: "ic-chip" }, icon("i-check")), h("h3", { text: s.title + ": done" })),
+      h("div", { class: "score-big", text: s.ok + " / " + s.n }),
+      h("p", { class: "small muted", style: "margin:0", text: upcoming ? "Next review due " + rel(upcoming - Date.now()) + ". Misses come back within minutes." : "Nothing scheduled yet." }),
+      h("div", { class: "row" },
+        h("button", { type: "button", class: "btn primary", text: "Another 10", onclick: function () { startSession(s.kind, s.opt); } }),
+        h("button", { type: "button", class: "btn", text: "Free practice", onclick: endSession }),
+        h("button", { type: "button", class: "btn ghost", text: "Home", onclick: function () { pr.session = null; pr.strip = null; show("home"); } }))));
+    pr.strip = { empty: true };
   }
   function nextPractice() {
     const v = views.practice;
     clear(v);
-    practiceHeader = h("div", { class: "stack" },
-      h("div", { class: "row-between" },
-        h("h2", { text: "Practice" }),
-        h("span", { class: "mono muted small", "aria-label": "Session score" })),
-      h("div", { class: "row" }, setPicker(), toggleBtn("Near the cutoffs", pr.edge, function (on) { pr.edge = on; nextPractice(); }))
-    );
+    const s = pr.session;
+    practiceHeader = s
+      ? h("div", { class: "stack" },
+          h("div", { class: "row-between" },
+            h("div", null, h("div", { class: "eyebrow", text: "Session" }), h("h2", { text: s.title })),
+            h("div", { class: "row" }, h("span", { class: "mono muted small", "aria-label": "Strip number" }),
+              h("button", { type: "button", class: "btn small ghost", text: "End", onclick: endSession }))))
+      : h("div", { class: "stack" },
+          h("div", { class: "row-between" },
+            h("h2", { text: "Practice" }),
+            h("span", { class: "mono muted small", "aria-label": "Session score" })),
+          h("div", { class: "row" }, setPicker(), toggleBtn("Near the cutoffs", pr.edge, function (on) { pr.edge = on; nextPractice(); })));
     v.append(practiceHeader);
-    renderPracticeHeader();
 
-    const ids = pr.mode === "review" ? progress.reviewIds() : setIds(pr.mode);
-    if (!ids.length) {
+    if (s && s.n >= SESSION_LEN) { sessionDone(v); renderPracticeHeader(); return; }
+    if (s && s.ids && !s.ids.length) {
       pr.strip = { empty: true };
       v.append(h("div", { class: "card empty" },
         h("div", { class: "big ic-chip" }, icon("i-check")),
-        h("p", { text: "Nothing to review." }),
-        h("p", { class: "small muted", text: "Missed rhythms land here and stay until you get them right twice in a row." }),
-        h("button", { type: "button", class: "btn primary", text: "Practice all rhythms", onclick: function () { pr.mode = "all"; nextPractice(); } })));
+        h("p", { text: s.empty }),
+        h("button", { type: "button", class: "btn primary", text: "Free practice", onclick: endSession })));
       return;
     }
-    const id = quiz.pickRhythm(progress.weights(ids), Math.random, pr.last);
-    pr.last = id;
-    pr.strip = ecg.generate(id, { borderline: pr.edge });
-    pr.shown = quiz.choices(id, Math.random, 4, pr.mode === "review" ? null : setIds(pr.mode));
+    let q;
+    if (s) q = s.pick();
+    else q = { id: quiz.pickRhythm(progress.weights(setIds(pr.mode)), Math.random, pr.last), edge: pr.edge };
+    pr.last = q.id;
+    pr.strip = ecg.generate(q.id, { borderline: !!q.edge });
+    pr.shown = quiz.choices(q.id, Math.random, 4, s ? null : setIds(pr.mode), q.must);
     pr.answered = false;
+    renderPracticeHeader();
     pr.widget = stripCard(pr.strip);
     v.append(pr.widget.el);
-    v.append(h("p", { class: "prompt", text: "What's the rhythm? Take your time." }));
+    v.append(h("p", { class: "prompt", text: q.must ? "Head to head: which one is it?" : "What's the rhythm? Take your time." }));
     const box = h("div", { class: "choices" });
-    pr.shown.forEach(function (cid, i) {
+    pr.shown.forEach(function (cid) {
       box.append(h("button", { type: "button", class: "choice", "data-id": cid, onclick: function () { answerPractice(cid, box); } },
         h("span", { text: name(cid) }), h("span", { class: "mark" })));
     });
@@ -479,18 +581,23 @@
       else if (id === chosen) { b.classList.add("wrong"); clear(m); m.append(icon("i-x"), "your pick"); }
     });
   }
+  const GRADE = { 1: "Missed", 2: "Right, but slower than usual", 3: "Right", 4: "Right, and fast" };
   function answerPractice(cid, box) {
     if (pr.answered) return;
     pr.answered = true;
     const ms = performance.now() - pr.at;
     const ok = cid === pr.strip.rhythm;
-    progress.record(pr.strip.rhythm, ok, ms, "practice");
+    const g = progress.record(pr.strip.rhythm, ok, ms, "practice", { pick: cid, shown: pr.shown, edge: pr.strip.edge });
     pr.n++; if (ok) pr.ok++;
+    if (pr.session) { pr.session.n++; if (ok) pr.session.ok++; }
     renderPracticeHeader();
     markChoices(box, pr.strip.rhythm, cid);
     const fb = feedback(pr.strip, cid, pr.shown, ms);
+    const it = progress.item("r:" + pr.strip.rhythm);
+    fb.insertBefore(h("p", { class: "small muted sched", text: GRADE[g] + " · back for review " + rel(it.due - Date.now()) }), fb.children[1]);
     views.practice.append(fb);
-    views.practice.append(h("button", { type: "button", class: "btn primary block sticky-next", text: "Next strip", onclick: nextPractice }));
+    const last = pr.session && pr.session.n >= SESSION_LEN;
+    views.practice.append(h("button", { type: "button", class: "btn primary block sticky-next", text: last ? "Finish session" : "Next strip", onclick: nextPractice }));
     if (!ok) fb.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -578,10 +685,15 @@
     const ms = Math.min(performance.now() - exam.qAt, exam.cfg.seconds * 1000);
     const ok = cid === exam.strip.rhythm;
     exam.results.push({ rhythm: exam.strip.rhythm, chosen: cid, ok: ok, ms: ms, strip: exam.strip, shown: exam.shown });
-    progress.record(exam.strip.rhythm, ok, ms, "exam");
+    progress.record(exam.strip.rhythm, ok, ms, "exam", { pick: cid, shown: exam.shown, edge: exam.strip.edge });
     exam.i++;
     if (exam.i < exam.plan.length) setTimeout(examQuestion, 120);
     else finishExam();
+  }
+  function examMissed(results) {
+    const out = [];
+    results.forEach(function (r) { if (!r.ok && out.indexOf(r.rhythm) < 0) out.push(r.rhythm); });
+    return out;
   }
   function finishExam() {
     exam.state = "done";
@@ -589,7 +701,7 @@
     const sc = quiz.scoreExam(exam.results, c.passMark, c.lethal);
     const avg = exam.results.reduce(function (s, r) { return s + r.ms; }, 0) / exam.results.length;
     progress.addSession({ mode: "exam", total: sc.total, correct: sc.correct, pct: sc.pct, passed: sc.passed,
-      passMark: c.passMark, lethal: c.lethal, seconds: c.seconds, avgMs: Math.round(avg), set: c.set || "all" });
+      passMark: c.passMark, lethal: c.lethal, seconds: c.seconds, avgMs: Math.round(avg), set: c.set || "all", missed: examMissed(exam.results) });
     const v = views.exam;
     clear(v);
     const reasons = [];
@@ -605,7 +717,7 @@
         sc.groups.map(function (g) { return h("tr", null, h("td", { text: g.name }), h("td", { class: "num", text: g.correct + " / " + g.total })); })) : null,
       h("div", { class: "row" },
         h("button", { type: "button", class: "btn primary", text: "New exam", onclick: function () { exam.state = "setup"; renderExamSetup(); } }),
-        progress.reviewIds().length ? h("button", { type: "button", class: "btn", text: "Practice my misses", onclick: function () { pr.mode = "review"; pr.strip = null; show("practice"); } }) : null)
+        examMissed(exam.results).length ? h("button", { type: "button", class: "btn", text: "Review my errors", onclick: function () { startSession("errors", { ids: examMissed(exam.results) }); } }) : null)
     ));
     const list = h("div", { class: "card" }, h("h3", { text: "Every strip" }));
     exam.results.forEach(function (r, i) {
@@ -627,23 +739,85 @@
     window.scrollTo(0, 0);
   }
 
-  // ---------- Progress ----------
+  // ---------- Progress: Mastery, Trends, Exams ----------
+  let progTab = "mastery";
+  function pctOf(x) { return x == null ? "–" : Math.round(x * 100) + "%"; }
   function renderProgress() {
     const v = views.progress;
     clear(v);
     const st = progress.stats(ALL);
-    const fmt = function (x) { return x == null ? "–" : x + "%"; };
     v.append(h("div", { class: "row" }, h("span", { class: "ic-chip blue" }, icon("i-progress")), h("h2", { text: "Progress" })));
     if (!st.total) {
-      v.append(h("div", { class: "card empty" }, h("p", { text: "No answers yet." }), h("p", { class: "small muted", text: "Practice or take an exam and your accuracy and speed show up here." })));
+      v.append(h("div", { class: "card empty" }, h("p", { text: "No answers yet." }), h("p", { class: "small muted", text: "Practice or take an exam and your mastery, trends and exam history show up here." })));
       return;
     }
+    v.append(seg([{ value: "mastery", label: "Mastery" }, { value: "trends", label: "Trends" }, { value: "exams", label: "Exams" }], progTab,
+      function (x) { progTab = x; renderProgress(); }, "Progress view"));
+    if (progress.migrated()) v.append(h("p", { class: "small muted", style: "margin:0", text: "Your earlier answers were carried over into the new scheduler." }));
+    if (progTab === "mastery") renderMastery(v);
+    else if (progTab === "trends") renderTrends(v, st);
+    else renderExams(v, st);
+  }
+  function statusOf(m, now) {
+    if (!m.seen) return { t: "Not tried", c: "" };
+    if (m.mastered) return { t: "Mastered", c: "ok" };
+    if (m.due != null && m.due <= now) return { t: "Due", c: "warn" };
+    if (m.learning) return { t: "Learning", c: "accent" };
+    return { t: "Reviewing", c: "accent" };
+  }
+  function renderMastery(v) {
+    const now = Date.now();
+    const all = progress.groupMastery(ALL, now);
+    v.append(h("div", { class: "tiles" },
+      h("div", { class: "tile" }, h("div", { class: "k", text: "Mastered" }), h("div", { class: "v", text: all.mastered + "/" + all.n }), h("div", { class: "s", text: "rhythms" })),
+      h("div", { class: "tile" }, h("div", { class: "k", text: "Due now" }), h("div", { class: "v", text: String(progress.dueItems(now).length) }), h("div", { class: "s", text: "reviews" }))));
+    rhythms.groups.forEach(function (g) {
+      const ids = groupIds(g.id);
+      const gm = progress.groupMastery(ids, now);
+      const t = h("table", { class: "table mastery" },
+        h("tr", null, h("th", { text: "Rhythm" }), h("th", { class: "num", text: "Recall" }), h("th", { class: "num", text: "Next" })));
+      progress.mastery(ids, now).forEach(function (m) {
+        const s = statusOf(m, now);
+        t.append(h("tr", null,
+          h("td", null, h("span", { text: rhythms.byId[m.id].short }), h("span", { class: "tag " + s.c, style: "margin-left:6px", text: s.t })),
+          h("td", { class: "num", text: m.seen ? pctOf(m.r) : "–" }),
+          h("td", { class: "num", text: !m.seen ? "–" : m.due <= now ? "now" : rel(m.due - now).replace(/^in /, "") })));
+      });
+      v.append(h("div", { class: "card stack" },
+        h("div", { class: "row-between" }, h("div", { class: "row" }, h("span", { class: "ic-chip" }, groupIcon(g.id)), h("h3", { text: g.name })),
+          h("span", { class: "small muted", text: gm.mastered + " of " + gm.n + " mastered" })),
+        h("div", { class: "bar", role: "img", "aria-label": g.name + " mastery " + Math.round(gm.score * 100) + "%" }, h("i", { style: "width:" + Math.round(gm.score * 100) + "%" })),
+        t));
+    });
+    v.append(h("div", { class: "card" }, h("h3", { text: "How mastery works" }),
+      h("p", { class: "small", text: "Recall is the scheduler's estimate (FSRS) that you'd get the rhythm right today. It drops the longer you go without seeing it." }),
+      h("p", { class: "small", text: "Mastered means: recall 90% or more, a memory that holds 21 days or more, right on at least 3 different days, the last one not slow, and no miss in the last 5 tries. Group bars average recall over mastered rhythms." }),
+      h("p", { class: "small muted", style: "margin:0", text: "These rules are a draft, to be tuned with the nurse review. The rhythm content is also still pending nurse review." })));
+  }
+  function renderTrends(v, st) {
+    const fmt = function (x) { return x == null ? "–" : x + "%"; };
     const tile = function (k, val, s) { return h("div", { class: "tile" }, h("div", { class: "k", text: k }), h("div", { class: "v", text: val }), h("div", { class: "s", text: s })); };
     v.append(h("div", { class: "tiles" },
       tile("Accuracy, all time", fmt(st.overall), st.total + " strips"),
       tile("Last 7 days", fmt(st.week), st.weekCount + " strips"),
       tile("Before that", fmt(st.before), st.beforeCount + " strips"),
       tile("Avg time, correct", st.weekAvgMs ? secs(st.weekAvgMs) : "–", "last 7 days")));
+    const tr = progress.trends(ALL, 8).filter(function (w) { return w.practice.n || w.exam.n || w.mastered; });
+    const wt = h("table", { class: "table trends" },
+      h("tr", null, h("th", { text: "Week to" }), h("th", { class: "num", text: "Practice" }), h("th", { class: "num", text: "Exam" }), h("th", { class: "num", text: "Mastered" })));
+    tr.reverse().forEach(function (w) {
+      const cell = function (x) {
+        if (!x.n) return h("td", { class: "num", text: "–" });
+        return h("td", { class: "num" }, h("b", { text: x.pct + "%" }), h("span", { class: "sub", text: x.n + " · " + (x.avgMs ? secs(x.avgMs) : "–") }));
+      };
+      wt.append(h("tr", null,
+        h("td", { text: new Date(w.end).toLocaleDateString(undefined, { month: "short", day: "numeric" }) }),
+        cell(w.practice),
+        cell(w.exam),
+        h("td", { class: "num", text: String(w.mastered) })));
+    });
+    v.append(h("div", { class: "card" }, h("h3", { style: "margin-bottom:10px", text: "Week by week" }), wt,
+      h("p", { class: "small muted", style: "margin:10px 0 0", text: "Each cell: accuracy, then strips · average time on correct answers. Practice is untimed, exams are timed, so they're kept apart." })));
     const t = h("table", { class: "table" },
       h("tr", null, h("th", { text: "Rhythm" }), h("th", { class: "num", text: "Last 20" }), h("th", { class: "num", text: "Speed" }), h("th", { class: "num", text: "Seen" })));
     let lastGroup = null;
@@ -651,24 +825,29 @@
       const g = rhythms.byId[p.id].group;
       if (g !== lastGroup) { lastGroup = g; t.append(h("tr", { class: "group-row" }, h("th", { colspan: "4" }, groupIcon(g), groupName(g)))); }
       t.append(h("tr", null,
-        h("td", null, rhythms.byId[p.id].short, p.inReview ? h("span", { class: "tag warn", style: "margin-left:6px", text: "review" }) : null,
+        h("td", null, rhythms.byId[p.id].short, p.inReview ? h("span", { class: "tag warn", style: "margin-left:6px", text: "due" }) : null,
           p.pct != null ? h("div", { class: "bar", "aria-hidden": "true" }, h("i", { style: "width:" + p.pct + "%" })) : null),
         h("td", { class: "num", text: p.pct == null ? "not tried" : p.pct + "%" }),
         h("td", { class: "num", text: p.avgMs ? secs(p.avgMs) : "–" }),
         h("td", { class: "num", text: String(p.attempts) })));
     });
     v.append(h("div", { class: "card" }, h("h3", { style: "margin-bottom:10px", text: "By rhythm" }), t,
-      h("p", { class: "small muted", style: "margin:10px 0 0", text: "Speed = average time on correct answers. Missed rhythms show more often in Practice." })));
-    if (st.exams.length) {
-      const et = h("table", { class: "table" }, h("tr", null, h("th", { text: "Exam" }), h("th", { class: "num", text: "Score" }), h("th", { class: "num", text: "Result" })));
-      st.exams.forEach(function (e) {
-        et.append(h("tr", null,
-          h("td", { text: new Date(e.at).toLocaleDateString() + " · " + e.total + " strips" }),
-          h("td", { class: "num", text: e.pct + "%" }),
-          h("td", { class: "num", text: e.passed ? "Pass" : "Not yet" })));
-      });
-      v.append(h("div", { class: "card" }, h("h3", { style: "margin-bottom:10px", text: "Recent exams" }), et));
-    }
+      h("p", { class: "small muted", style: "margin:10px 0 0", text: "Speed = average time on correct answers, practice and exam together." })));
+  }
+  function renderExams(v, st) {
+    if (!st.exams.length) { v.append(h("div", { class: "card empty" }, h("p", { text: "No exams yet." }), h("button", { type: "button", class: "btn primary", text: "Take an exam", onclick: function () { show("exam"); } }))); return; }
+    const list = h("div", { class: "card stack" }, h("h3", { text: "Recent exams" }));
+    st.exams.forEach(function (e) {
+      const missed = e.missed || [];
+      list.append(h("div", { class: "exam-row" },
+        h("div", { class: "grow" },
+          h("strong", { text: e.pct + "% · " + (e.passed ? "Pass" : "Not yet") }),
+          h("div", { class: "small muted", text: new Date(e.at).toLocaleDateString() + " · " + e.total + " strips" + (missed.length ? " · missed " + missed.map(function (id) { return rhythms.byId[id] ? rhythms.byId[id].short : id; }).join(", ") : "") })),
+        missed.length ? h("button", { type: "button", class: "btn small", text: "Review errors", onclick: function () { startSession("errors", { ids: missed.filter(function (id) { return rhythms.byId[id]; }) }); } }) : null));
+    });
+    v.append(list);
+    if (st.exams.some(function (e) { return !e.missed && e.correct < e.total; }))
+      v.append(h("p", { class: "small muted", text: "Exams from before this update didn't save which rhythms were missed, so they have no review button." }));
   }
 
   // ---------- dialogs ----------

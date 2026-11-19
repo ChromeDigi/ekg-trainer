@@ -213,14 +213,16 @@
   }
 
   // Correct answer plus meaningful distractors: the rhythm's lookalikes first, then its
-  // own group, rarely anything else. pool (optional) limits choices to a rhythm set.
-  function choices(correctId, rand, n, pool) {
+  // own group, rarely anything else. pool (optional) limits choices to a rhythm set;
+  // must (optional) lists rhythms that have to be among the choices (contrast drills).
+  function choices(correctId, rand, n, pool, must) {
     n = n || 4;
     rand = rand || Math.random;
     const all = (pool && pool.length >= n ? pool : RH().list.map(function (r) { return r.id; }));
     const inPool = function (id) { return all.indexOf(id) >= 0; };
     const R = RH().byId[correctId];
     const picked = [correctId];
+    (must || []).forEach(function (id) { if (picked.length < n && picked.indexOf(id) < 0) picked.push(id); });
     const add = function (ids, p) {
       shuffle(ids, rand).forEach(function (id) {
         if (picked.length < n && picked.indexOf(id) < 0 && inPool(id) && rand() < p) picked.push(id);
