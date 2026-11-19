@@ -69,7 +69,7 @@ untouched. The old "right twice in a row" review list is replaced by FSRS due it
   a draft.
 
 ## Status (2026-11-19)
-Built on branch `step-3-adaptive-learning`, committed, not pushed.
+Merged to main and live 2026-11-19. Live site re-checked in Chromium at iPhone 13 and SE: migration, a full session, all Progress views, no errors.
 
 Verified:
 - `node tests/run.js`: about 3.07 million checks pass, including 362 FSRS reviews matching

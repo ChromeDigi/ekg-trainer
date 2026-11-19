@@ -8,16 +8,18 @@ Updated 2026-11-19. Read CLAUDE.md, then docs/plan.md, then this.
   and live. Owner checked it on a real iPhone: "looks perfect".
 
 ## In progress
-- Step 3 (adaptive learning) built on branch `step-3-adaptive-learning`, committed, not
-  pushed. FSRS-6 scheduler (`js/fsrs.js`), `ekg.progress.v2` with v1 replay, contrast and
+- Step 3 (adaptive learning) merged to main and live. FSRS-6 scheduler (`js/fsrs.js`), `ekg.progress.v2` with v1 replay, contrast and
   near-cutoff items, mastery, Today card on Home, 10-strip sessions, Progress
   Mastery/Trends/Exams. Details, verification and gaps: `docs/phases/4-adaptive-learning.md`.
-- Waiting for the owner's "push", then merge to main and a real-iPhone check.
+- Owner hasn't checked step 3 on the real iPhone yet.
 
 ## Next
-- After the push: merge to main, owner checks on the iPhone.
-- Then clinical side-tracks ("what now" scenarios, post-op strips) or step 4/5 per
-  docs/plan.md. Prompts in docs/prompts.md.
+- Owner chose: **step 5, campus research and blockout** (`docs/future/3d-campus.md`,
+  prompt in docs/prompts.md). Video comes after the campus so it's made once with real
+  features. Three.js needs owner approval as the first dependency (ask with buttons).
+- Video tools: HyperFrames compose/render are disabled from Claude Code; Canva is
+  connected (video quality untested); Playwright records the real app; Remotion needs npm
+  and owner approval, dev-only.
 - Nurse review of the 26 rhythm cards (all `review: "pending"`) and of the draft mastery
   rules is still open. Most important open item.
 - After UI changes: `python3 -m http.server 8765` then `node tools/capture-tour.js`.
